@@ -91,8 +91,9 @@ export default function Navbar() {
                     height={50}
                   />
                 ) : (
-                  <div className="w-full h-full bg-gradient-to-br from-purple-400 via-pink-400 to-red-400 flex items-center justify-center text-white text-4xl font-bold shadow-lg">
-                    {user?.firstname?.[0]} {user?.lastname?.[0]}
+                  <div className="w-full h-full bg-gradient-to-br from-purple-400 via-pink-400 to-red-400 flex items-center justify-center text-white text-2xl font-bold shadow-lg">
+                    {user?.firstname?.[0]}
+                    {user?.lastname?.[0]}
                   </div>
                 )}
               </div>
@@ -135,13 +136,20 @@ export default function Navbar() {
               className="mb-2 pb-2 border-b border-gray-200"
             >
               <div className="flex gap-3 py-2 px-2 hover:bg-gray-100 rounded-lg ">
-                <Image
-                  className="size-14 object-cover rounded-full"
-                  src={user?.profileImage?.imageUrl || ""}
-                  width={50}
-                  height={50}
-                  alt="Profile"
-                />
+                {user?.profileImage?.imageUrl ? (
+                  <Image
+                    className="size-14 object-cover rounded-full"
+                    src={user?.profileImage?.imageUrl || ""}
+                    width={50}
+                    height={50}
+                    alt="Profile"
+                  />
+                ) : (
+                  <div className="size-14  rounded-full bg-gradient-to-br from-purple-400 via-pink-400 to-red-400 flex items-center justify-center text-white text-xl font-bold shadow-lg">
+                    {user?.firstname?.[0]}
+                    {user?.lastname?.[0]}
+                  </div>
+                )}
                 <div>
                   <p className="font-medium">
                     {user?.firstname} {user?.lastname}

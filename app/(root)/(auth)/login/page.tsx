@@ -65,7 +65,7 @@ export default function Login() {
   }
 
   useEffect(() => {
-    if (!user === null || !user === undefined) {
+    if (user && user !== null) {
       return
     }
     if (status === "authenticated" && session?.user?._id) {
