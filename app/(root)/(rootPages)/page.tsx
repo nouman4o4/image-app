@@ -4,23 +4,12 @@ import React, { useEffect, useState } from "react"
 import MediaContainer from "../../components/MediaContainer"
 import { apiClient } from "@/lib/api-client"
 import { IMediaClient } from "@/types/interfaces"
-import { useUserStore } from "@/store/useUserStore"
-import { useSession } from "next-auth/react"
-import { getUserData } from "@/actions/userActions"
 
 export default function Home() {
   const [media, setMedia] = useState<IMediaClient[]>([])
   const [loading, setLoading] = useState(true)
-  const { user, setUser } = useUserStore()
-  const { data: session } = useSession()
 
   useEffect(() => {
-    const fetchUser = async () => {
-      if (session?.user._id && !user) {
-        const user = await getUserData(session.user._id)
-        if (user) setUser(user)
-      } else return
-    }
     const fetchAllMedia = async () => {
       try {
         setLoading(true)
@@ -40,7 +29,7 @@ export default function Home() {
         setLoading(false)
       }
     }
-    fetchUser()
+
     fetchAllMedia()
   }, [])
 
