@@ -14,6 +14,7 @@ export const getUserData = async (id: string) => {
       console.log("Invalid userId for getting user deta")
       return
     }
+    await connectDB()
     const user = await User.findById(id).select("-password").lean()
     if (!user) {
       console.log("User not found with given id")
