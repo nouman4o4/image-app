@@ -6,6 +6,7 @@ import Providers from "./providers/Providers"
 import Navbar from "./components/Navbar"
 import Sidebar from "./components/Sidebar"
 import Label from "./components/Label"
+import { AuthUserLoader } from "./components/AuthUserLoader"
 
 // const geistSans = Geist({
 //   variable: "--font-geist-sans",
@@ -32,11 +33,13 @@ export default function RootLayout({
       <body className={`antialiased max-w-[1440px] mx-auto relative`}>
         <Toaster />
         <Providers>
-          <Navbar />
-          <div className="mt-20 relative ">{children}</div>
-          <div className="fixed top-4 right-4 z-50">
-            <Label />
-          </div>
+          <AuthUserLoader>
+            <Navbar />
+            <div className="mt-20 relative ">{children}</div>
+            <div className="fixed top-4 right-4 z-50">
+              <Label />
+            </div>
+          </AuthUserLoader>
         </Providers>
       </body>
     </html>
