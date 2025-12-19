@@ -40,7 +40,7 @@ export default function Home() {
         setLoading(false)
       }
     }
-    // fetchUser()
+    fetchUser()
     fetchAllMedia()
   }, [])
 
