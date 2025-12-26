@@ -78,10 +78,8 @@ export function useFileUpload() {
       console.error("Upload error:", err)
 
       return false
-    } finally {
-      setProgress(0)
     }
   }
 
-  return { uploadFile, progress }
+  return { uploadFile, progress, setProgress }
 }

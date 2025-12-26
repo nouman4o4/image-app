@@ -26,7 +26,7 @@ export default function FileUpload() {
   } | null>()
   const router = useRouter()
 
-  const { uploadFile, progress } = useFileUpload()
+  const { uploadFile, progress, setProgress } = useFileUpload()
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const selectedFile = e.target.files?.[0]
@@ -95,12 +95,14 @@ export default function FileUpload() {
       }
 
       toast.success("File uploaded successfully!")
+      setLoading(false)
       router.back()
     } catch (error) {
       console.error(error)
       toast.error("Failed uploading the file")
     } finally {
       setLoading(false)
+      setProgress(0)
     }
   }
 
@@ -148,7 +150,6 @@ export default function FileUpload() {
             value={description}
             onChange={(e) => {
               setDescription(e.target.value)
-              console.log(description)
             }}
             placeholder="Write something about your post..."
             rows={3}
@@ -232,15 +233,14 @@ export default function FileUpload() {
                   <p className="text-white font-medium text-lg tracking-wide animate-pulse">
                     Uploading your file...
                   </p>
-
-                  {/* Progress bar */}
+                  {/* Progress bar */}(
                   <div className="w-64 bg-gray-700 rounded-full h-3 overflow-hidden">
                     <div
                       className="h-full bg-gradient-to-r from-blue-400 via-indigo-400 to-purple-500 rounded-full transition-all duration-300 ease-out animate-pulse"
                       style={{ width: `${progress}%` }}
                     ></div>
                   </div>
-
+                  )
                   <p className="text-sm text-gray-200 font-light">
                     {progress}% complete
                   </p>
