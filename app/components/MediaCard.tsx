@@ -1,6 +1,6 @@
 import { IMediaClient } from "@/types/interfaces"
 import { Video, Image } from "@imagekit/next"
-import { Bookmark, Download, Heart } from "lucide-react"
+import { Upload } from "lucide-react"
 import Link from "next/link"
 import React, { useState } from "react"
 
@@ -53,30 +53,21 @@ export default function MediaCard({ item }: { item: IMediaClient }) {
       <div className="buttons-overlay-div absolute inset-0 z-10 opacity-0 group-hover:opacity-100 transition-opacity duration-100 bg-black/10 cursor-pointer pointer-events-none">
         <div className="w-full h-full flex flex-col justify-between items-end p-2 pointer-events-none z-20">
           <div className="w-fit pointer-events-auto">
-            <button className="p-2 rounded-full bg-gray-100 text-gray-700 hover:scale-105 scale-95 transition-all duration-100 cursor-pointer">
-              <Download className="size-5" />
-            </button>
-          </div>
-          <div className="w-full flex items-center justify-between pointer-events-auto">
             <button
               onClick={handleSave}
-              className={`p-3 rounded-full hover:scale-105 scale-95 transition-all duration-100 cursor-pointer ${
-                isSaved
-                  ? "text-gray-100  bg-yellow-700"
-                  : "bg-gray-100  text-gray-700"
-              }`}
+              className={`p-3 rounded-2xl  ${
+                isSaved ? "bg-gray-700" : "bg-red-600"
+              } text-white font-medium hover:scale-105 scale-95 transition-all duration-100 cursor-pointer`}
             >
-              <Bookmark className="size-5" />
+              {isSaved ? "Saved" : "Save"}
             </button>
+          </div>
+          <div className="w-full flex items-center justify-end poiSnter-events-auto">
             <button
               onClick={handleLike}
-              className={`p-2 rounded-full hover:scale-105 scale-95 transition-all duration-100 cursor-pointer ${
-                IsLiked
-                  ? "text-gray-100 bg-red-600"
-                  : "bg-gray-100 text-red-600"
-              }`}
+              className={`p-2 rounded-xl bg-white cursor-pointer `}
             >
-              <Heart className="size-5" />
+              <Upload className="size-5" />
             </button>
           </div>
         </div>

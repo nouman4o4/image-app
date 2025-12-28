@@ -18,8 +18,6 @@ export default function RelatedMedia() {
           console.error("Could not fetch the media due to server error.")
           return
         }
-        console.log("Fetch all media response: ", response)
-
         setMedia(response.data)
       } catch (error) {
         console.error(error)

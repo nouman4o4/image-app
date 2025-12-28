@@ -16,6 +16,7 @@ import { Video } from "@imagekit/next"
 import CommentsSection from "./CommentsSection"
 import { useUserStore } from "@/store/useUserStore"
 import { getUserData } from "@/actions/userActions"
+import { useSession } from "next-auth/react"
 
 export default function MediaComponent({
   mediaData,
@@ -27,6 +28,10 @@ export default function MediaComponent({
   const [likes, setLikes] = useState(234)
   const { user } = useUserStore()
   const [creator, setCreator] = useState<IUserClient>()
+
+  const { data: session, status } = useSession()
+
+  const userAuthenticated = status === "authenticated" && user !== null
 
   const handleLike = () => {
     setIsLiked(!isLiked)
@@ -48,7 +53,7 @@ export default function MediaComponent({
   }
 
   return (
-    <div className="min-h-screen w-full flex flex-col items-center px-4 py-12 max-w-6xl">
+    <div className="min-h-screen w-full px-4 py-12 max-w-6xl">
       {/* Container with glassmorphism effect */}
       <div className="w-full max-w-7xl">
         <div className="w-full p-4 md:p-6 grid md:grid-cols-2 gap-2 md:gap-4 lg:gap-6 items-start bg-white rounded-3xl shadow-lg">
