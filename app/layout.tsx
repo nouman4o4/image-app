@@ -30,7 +30,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body className={`antialiased max-w-[1440px] mx-auto relative`}>
+      <body className={`antialiased relative`}>
         <Toaster />
         <Providers>
           <AuthUserLoader>

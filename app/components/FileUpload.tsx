@@ -1,13 +1,18 @@
-"use client" // This component must be a client component
+"use client"
 
-import { signOut, useSession } from "next-auth/react"
 import React, { useState } from "react"
-import { useRouter } from "next/navigation"
-import Image from "next/image"
-import { Upload, X } from "lucide-react"
+import { Upload, X, ChevronLeft } from "lucide-react"
 import toast from "react-hot-toast"
 import { fileUploadShcema } from "@/schemas/fileuploadSchema"
+import { useRouter } from "next/navigation"
+import { signOut, useSession } from "next-auth/react"
 import { useFileUpload } from "@/hooks/useFileUpload"
+
+interface FileUploadState {
+  file?: string[]
+  title?: string[]
+  descirption?: string[]
+}
 
 export default function FileUpload() {
   const [title, setTitle] = useState("")
@@ -105,165 +110,189 @@ export default function FileUpload() {
       setProgress(0)
     }
   }
-
+  const handleDragOver = (e: React.DragEvent<HTMLDivElement>) => {
+    e.preventDefault()
+    e.stopPropagation()
+  }
+  const handleDrop = (e: React.DragEvent<HTMLDivElement>) => {
+    e.preventDefault()
+    e.stopPropagation()
+    const droppedFile = e.dataTransfer.files?.[0]
+    if (droppedFile) {
+      const changeEvent = {
+        target: { files: [droppedFile] },
+      } as unknown as React.ChangeEvent<HTMLInputElement>
+      handleFileChange(changeEvent)
+    }
+  }
+  const clearFile = () => {
+    setFile(null)
+    setFileType(null)
+    setPreviewUrl(null)
+    setErrors({ ...errors, file: undefined })
+  }
   return (
-    <div className="h-auto min-h-[calc(100vh-55px)] w-full flex items-center justify-center bg-gray-50 overflow-hidden py-0 md:py-10">
-      <form
-        onSubmit={handleSubmit}
-        className="w-full max-w-3xl bg-white shadow-md md:rounded-2xl p-4 md:p-8 border border-gray-100"
-      >
-        <div className="text-center mb-10">
-          {/* <div className="inline-flex items-center justify-center w-16 h-16 bg-gradient-to-br from-purple-500 via-pink-500 to-red-500 rounded-2xl shadow-lg mb-4">
-            <Sparkles className="w-8 h-8 text-white" />
-          </div> */}
-          <h2 className="text-4xl font-bold bg-gradient-to-r from-purple-600 via-pink-600 to-red-600 bg-clip-text text-transparent mb-2">
-            Upload Your Media
-          </h2>
-          <p className="text-gray-600">
-            Share your creative work with the world
-          </p>
-        </div>
-        <div className="mb-6 relative">
-          <label className="block text-gray-700 font-medium mb-2">
-            Title <span className="text-red-500">*</span>
-          </label>
-          <input
-            type="text"
-            value={title}
-            onChange={(e) => {
-              setTitle(e.target.value)
-              setErrors({ ...errors, title: undefined })
-            }}
-            placeholder="Enter a catchy title"
-            className="w-full border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:border-pink-400  focus:ring-pink-100 transition-all duration-200 text-gray-800 placeholder:text-gray-400"
-          />
-          <div className="error absolute left-1 -bottom-5 text-sm text-red-300">
-            {errors?.title ? errors.title[0] : ""}
-          </div>
-        </div>
-
-        <div className="mb-6 relative">
-          <label className="block text-gray-700 font-medium mb-2">
-            Description
-          </label>
-          <textarea
-            value={description}
-            onChange={(e) => {
-              setDescription(e.target.value)
-            }}
-            placeholder="Write something about your post..."
-            rows={3}
-            className="w-full border border-gray-300 rounded-lg px-4 py-2 resize-none focus:outline-none focus:border-pink-400  focus:ring-pink-100 transition-all duration-200 text-gray-800 placeholder:text-gray-400"
-          ></textarea>
-          <div className="error absolute left-1 -bottom-4 text-sm text-red-300">
-            {errors?.descirption ? errors.descirption[0] : ""}
-          </div>
-        </div>
-
-        <div className="mb-7">
-          <label className="block text-gray-700 font-medium mb-2">
-            Upload File
-          </label>
-          {!previewUrl && (
-            <div
-              className={`w-fit mx-auto relative border-dashed border-2  rounded-lg px-4 flex items-center justify-center py-4 ${
-                errors?.file ? "border-red-300" : "border-gray-300"
-              }`}
-            >
-              <label
-                htmlFor="file"
-                className="text-center w-fit p-3 cursor-pointer flex items-center flex-col gap-3"
-              >
-                <div className="w-20 h-20 bg-gradient-to-br from-purple-100 to-pink-100 rounded-2xl flex items-center justify-center">
-                  <Upload className="w-10 h-10 text-purple-600" />
-                </div>
-                <p className="text-lg font-semibold text-gray-700 mb-1">
-                  Drop your files here or click to browse
-                </p>
-
-                <input
-                  type="file"
-                  name="file"
-                  id="file"
-                  accept="image/*,video/*"
-                  onChange={handleFileChange}
-                  className="sr-only"
-                />
-              </label>
-              <div className="error absolute left-1 -bottom-6 text-sm text-red-300">
-                {errors?.file ? errors.file[0] : ""}
-              </div>
-            </div>
-          )}
-        </div>
-
-        {previewUrl && (
-          <div className="relative mb-5 rounded-lg md:rounded-xl overflow-hidden border border-gray-200 shadow-sm flex justify-center p-4 pt-8 md:p-8">
-            <div className="absolute top-1 right-1 md:top-5 md:right-5 size-6 md:size-8 rounded p-[1px] bg-gray-400 hover:scale-110 transition-transform duration-100">
-              <X
-                className="text-white cursor-pointer w-full h-full"
-                onClick={() => {
-                  setFile(null)
-                  setFileType(null)
-                  setPreviewUrl("")
-                  setErrors({ ...errors, file: undefined })
-                }}
-              />
-            </div>
-            {fileType === "image" ? (
-              <Image
-                src={previewUrl}
-                alt="preview"
-                className="w-auto h-auto max-h-[400px] object-contain rounded md:rounded-lg"
-                width={400}
-                height={400}
-              />
-            ) : (
-              <video
-                src={previewUrl}
-                controls
-                className="w-auto h-auto max-h-[400px] object-contain rounded-lg"
-              />
-            )}
-
-            {loading && (
-              <div className="absolute inset-0 bg-black/60 backdrop-blur-sm flex flex-col justify-center items-center z-50">
-                <div className="flex flex-col items-center space-y-6 p-6 rounded-2xl bg-white/10 shadow-xl border border-white/20 backdrop-blur-md">
-                  {/* Uploading text */}
-                  <p className="text-white font-medium text-lg tracking-wide animate-pulse">
-                    Uploading your file...
-                  </p>
-                  {/* Progress bar */}(
-                  <div className="w-64 bg-gray-700 rounded-full h-3 overflow-hidden">
-                    <div
-                      className="h-full bg-gradient-to-r from-blue-400 via-indigo-400 to-purple-500 rounded-full transition-all duration-300 ease-out animate-pulse"
-                      style={{ width: `${progress}%` }}
-                    ></div>
-                  </div>
-                  )
-                  <p className="text-sm text-gray-200 font-light">
-                    {progress}% complete
-                  </p>
-                </div>
-              </div>
-            )}
-          </div>
-        )}
-
-        <div className="text-center pt-4">
-          <button
-            type="submit"
-            disabled={loading}
-            className={`w-full py-3 rounded-lg font-semibold transition duration-75 cursor-pointer ${
-              loading
-                ? "bg-gray-400 cursor-not-allowed"
-                : "bg-gradient-to-r from-purple-500 via-pink-500 to-red-500 text-white hover:shadow-2xl hover:shadow-pink-500/50 hover:scale-[1.02] active:scale-[0.98]"
-            }`}
-          >
-            {loading ? "Uploading..." : "Upload"}
+    <div className=" w-full flex flex-col">
+      {/* Navbar */}
+      <nav className="border-b border-gray-200 px-4 md:px-8 py-4 flex items-center justify-between bg-white">
+        <div className="flex items-center gap-4">
+          <button className="text-gray-700 hover:text-gray-900 transition-colors">
+            <ChevronLeft
+              onClick={() => router.back()}
+              className="w-6 h-6 cursor-pointer"
+            />
           </button>
+          <h1 className="text-2xl font-bold text-gray-900">Create Pin</h1>
         </div>
-      </form>
+        <button
+          onClick={handleSubmit}
+          disabled={loading || !file || !title.trim()}
+          className={`py-2 px-6 rounded-full font-semibold transition-all duration-200 ${
+            loading || !file || !title.trim()
+              ? "bg-gray-200 text-gray-500 cursor-not-allowed"
+              : "bg-red-500 text-white hover:bg-red-600 active:scale-95"
+          }`}
+        >
+          {loading ? "Publishing..." : "Publish"}
+        </button>
+      </nav>
+
+      {/* Main Content */}
+      <div className="flex flex-1 flex-col md:flex-row w-full max-w-6xl mx-auto">
+        {/* Left Side - Upload Area */}
+        <div className="w-full lg:w-1/2 flex flex-col items-center justify-center p-8 lg:p-16 bg-white">
+          <div className="w-full max-w-md">
+            {!previewUrl ? (
+              <div
+                className="mb-8 bg-gray-100 rounded-2xl p-6 md:p-12 flex flex-col items-center justify-center cursor-pointer hover:bg-gray-200 transition-colors duration-200 border-2 border-dashed border-gray-300"
+                onDragOver={handleDragOver}
+                onDrop={handleDrop}
+              >
+                <label htmlFor="file" className="w-full cursor-pointer">
+                  <div className="flex flex-col items-center justify-center gap-4">
+                    <div className="w-16 h-16 bg-white rounded-full flex items-center justify-center">
+                      <Upload className="w-8 h-8 text-gray-600" />
+                    </div>
+                    <div className="text-center">
+                      <p className="text-lg font-semibold text-gray-800 mb-1">
+                        Click to upload
+                      </p>
+                      <p className="text-sm text-gray-500">or drag and drop</p>
+                      <p className="text-xs text-gray-400 mt-2">
+                        PNG, JPG, GIF or MP4
+                      </p>
+                    </div>
+                  </div>
+                  <input
+                    type="file"
+                    name="file"
+                    id="file"
+                    accept="image/*,video/*"
+                    onChange={handleFileChange}
+                    className="sr-only"
+                  />
+                </label>
+              </div>
+            ) : (
+              <div className="relative mb-8 rounded-2xl overflow-hidden">
+                <button
+                  type="button"
+                  onClick={clearFile}
+                  className="absolute top-3 left-3 z-10 bg-gray-800 hover:bg-gray-900 text-white rounded-full p-2 transition-colors duration-200"
+                >
+                  <X className="w-5 h-5" />
+                </button>
+                <div className="h-96">
+                  {fileType === "image" ? (
+                    <img
+                      src={previewUrl}
+                      alt="preview"
+                      className="w-full h-full object-cover"
+                    />
+                  ) : (
+                    <video
+                      src={previewUrl}
+                      controls
+                      className="w-full h-full object-cover"
+                    />
+                  )}
+                </div>
+
+                {loading && (
+                  <div className="absolute inset-0 bg-black/40 backdrop-blur-sm flex items-center justify-center z-50">
+                    <div className="flex flex-col items-center space-y-3">
+                      <div className="w-12 h-12 border-4 border-white border-t-transparent rounded-full animate-spin"></div>
+                      <p className="text-white font-medium text-sm">
+                        Uploading...
+                      </p>
+                      <p className="text-white/80 text-xs">{progress}%</p>
+                    </div>
+                  </div>
+                )}
+              </div>
+            )}
+          </div>
+        </div>
+
+        {/* Right Side - Form */}
+        <div className="w-full lg:w-1/2 flex flex-col justify-between p-8 lg:p-16 bg-white border-l border-gray-200 overflow-y-auto">
+          <div>
+            <div className="mb-8">
+              <p className="text-gray-600">
+                Add a title and description to your media
+              </p>
+            </div>
+
+            {/* Title Input */}
+            <div className="mb-6">
+              <label className="block text-gray-800 font-semibold mb-3">
+                Title <span className="text-red-500">*</span>
+              </label>
+              <input
+                type="text"
+                value={title}
+                onChange={(e) => {
+                  setTitle(e.target.value)
+                  setErrors({ ...errors, title: undefined })
+                }}
+                placeholder="Add your title"
+                maxLength={100}
+                className="w-full border border-gray-300 rounded-xl px-4 py-3 focus:outline-none focus:border-gray-400 focus:ring-2 focus:ring-gray-100 transition-all duration-200 text-gray-800 placeholder:text-gray-400"
+              />
+              <p className="text-xs text-gray-400 mt-2">{title.length}/100</p>
+              {errors?.title && (
+                <p className="text-sm text-red-500 mt-1">{errors.title[0]}</p>
+              )}
+            </div>
+
+            {/* Description Input */}
+            <div className="mb-6">
+              <label className="block text-gray-800 font-semibold mb-3">
+                Description
+              </label>
+              <textarea
+                value={description}
+                onChange={(e) => {
+                  setDescription(e.target.value)
+                  setErrors({ ...errors, descirption: undefined })
+                }}
+                placeholder="Tell people more about this pin"
+                rows={4}
+                maxLength={500}
+                className="w-full border border-gray-300 rounded-xl px-4 py-3 resize-none focus:outline-none focus:border-gray-400 focus:ring-2 focus:ring-gray-100 transition-all duration-200 text-gray-800 placeholder:text-gray-400"
+              />
+              <p className="text-xs text-gray-400 mt-2">
+                {description.length}/500
+              </p>
+              {errors?.descirption && (
+                <p className="text-sm text-red-500 mt-1">
+                  {errors.descirption[0]}
+                </p>
+              )}
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
   )
 }
