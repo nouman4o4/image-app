@@ -17,6 +17,7 @@ import CommentsSection from "./CommentsSection"
 import { useUserStore } from "@/store/useUserStore"
 import { getUserData } from "@/actions/userActions"
 import { useSession } from "next-auth/react"
+import { toggleLike } from "@/actions/toggleLike"
 
 export default function MediaComponent({
   mediaData,
@@ -28,14 +29,18 @@ export default function MediaComponent({
   const [likes, setLikes] = useState(234)
   const { user } = useUserStore()
   const [creator, setCreator] = useState<IUserClient>()
-
+  const [hasInteracted, setHasInteracted] = useState(false)
   const { data: session, status } = useSession()
 
   const userAuthenticated = status === "authenticated" && user !== null
 
-  const handleLike = () => {
-    setIsLiked(!isLiked)
-    setLikes(isLiked ? likes - 1 : likes + 1)
+  const handleLike = async () => {
+    setHasInteracted(true)
+
+    setIsLiked((prev) => !prev)
+    setLikes((prev) => (isLiked ? prev - 1 : prev + 1))
+
+    await toggleLike({ mediaId: mediaData._id!, userId: user?._id! })
   }
 
   useEffect(() => {
@@ -44,7 +49,15 @@ export default function MediaComponent({
       setCreator(data)
     }
     getCreator()
-  }, [mediaData])
+
+    if (!user?._id || hasInteracted) return
+
+    const liked = mediaData?.likes?.some(
+      (id: any) => id.toString() === user._id
+    )
+
+    setIsLiked(liked || false)
+  }, [user?._id, mediaData])
 
   if (!mediaData) {
     return (
@@ -53,13 +66,13 @@ export default function MediaComponent({
   }
 
   return (
-    <div className="min-h-screen w-full px-4 py-12 max-w-6xl">
+    <div className=" w-full px-4  max-w-6xl">
       {/* Container with glassmorphism effect */}
       <div className="w-full max-w-7xl">
         <div
-          className={`w-full p-4 md:p-6 grid gap-2 md:gap-4 lg:gap-6 items-start bg-white rounded-3xl shadow-lg ${
-            userAuthenticated ? "grid-cols-1" : "md:grid-cols-2"
-          }`}
+          className={`w-full p-4 md:p-6 grid md:grid-cols-2 gap-2 md:gap-4 lg:gap-6 items-start bg-white rounded-3xl shadow-lg
+            
+          `}
         >
           {/* Media Section - Left Side */}
           <div className="relative group ">
@@ -103,10 +116,16 @@ export default function MediaComponent({
             <div className="flex items-center justify-between">
               <div className="flex">
                 <div className="flex items-center">
-                  <button className="p-2 hover:bg-gray-100 rounded-lg cursor-pointer">
-                    <Heart />{" "}
+                  <button
+                    onClick={handleLike}
+                    className="p-2 hover:bg-gray-100 rounded-lg cursor-pointer"
+                  >
+                    <Heart className={`${isLiked ? "fill-red-600" : ""}`} />{" "}
                   </button>{" "}
-                  <span className="font-medium"> {mediaData.likes || 0}</span>
+                  <span className="font-medium">
+                    {" "}
+                    {mediaData.likes?.length || 0}
+                  </span>
                 </div>
               </div>
 
