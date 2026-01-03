@@ -56,7 +56,11 @@ export default function MediaComponent({
     <div className="min-h-screen w-full px-4 py-12 max-w-6xl">
       {/* Container with glassmorphism effect */}
       <div className="w-full max-w-7xl">
-        <div className="w-full p-4 md:p-6 grid md:grid-cols-2 gap-2 md:gap-4 lg:gap-6 items-start bg-white rounded-3xl shadow-lg">
+        <div
+          className={`w-full p-4 md:p-6 grid gap-2 md:gap-4 lg:gap-6 items-start bg-white rounded-3xl shadow-lg ${
+            userAuthenticated ? "grid-cols-1" : "md:grid-cols-2"
+          }`}
+        >
           {/* Media Section - Left Side */}
           <div className="relative group ">
             <div className="relative w-full pr-3 rounded-2xl overflow-hidden mx-auto">
