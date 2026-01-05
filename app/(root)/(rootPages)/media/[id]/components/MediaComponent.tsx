@@ -18,6 +18,7 @@ import { useUserStore } from "@/store/useUserStore"
 import { getUserData } from "@/actions/userActions"
 import { useSession } from "next-auth/react"
 import { toggleLike } from "@/actions/toggleLike"
+import { toggleSave } from "@/actions/toggleSave"
 
 export default function MediaComponent({
   mediaData,
@@ -26,21 +27,37 @@ export default function MediaComponent({
 }) {
   const [isLiked, setIsLiked] = useState(false)
   const [isSaved, setIsSaved] = useState(false)
-  const [likes, setLikes] = useState(234)
+  const [likes, setLikes] = useState(mediaData.likes?.length || 0)
   const { user } = useUserStore()
   const [creator, setCreator] = useState<IUserClient>()
   const [hasInteracted, setHasInteracted] = useState(false)
+  const [hasInteractedWithSave, setHasInteractedWithSave] = useState(false)
+  const [isCreator, setIsCreator] = useState(false)
   const { data: session, status } = useSession()
 
   const userAuthenticated = status === "authenticated" && user !== null
 
   const handleLike = async () => {
     setHasInteracted(true)
-
     setIsLiked((prev) => !prev)
     setLikes((prev) => (isLiked ? prev - 1 : prev + 1))
-
     await toggleLike({ mediaId: mediaData._id!, userId: user?._id! })
+  }
+
+  const handleSave = async () => {
+    setHasInteractedWithSave(true)
+    setIsSaved((prev) => !prev)
+
+    try {
+      await toggleSave({
+        mediaId: mediaData._id!,
+        userId: user?._id!,
+      })
+    } catch (error) {
+      // rollback on failure
+      setIsSaved((prev) => !prev)
+      console.log(error)
+    }
   }
 
   useEffect(() => {
@@ -50,13 +67,21 @@ export default function MediaComponent({
     }
     getCreator()
 
-    if (!user?._id || hasInteracted) return
+    setIsCreator(mediaData.uploadedBy.toString() === user?._id.toString())
 
-    const liked = mediaData?.likes?.some(
-      (id: any) => id.toString() === user._id
-    )
+    if (user?._id || !hasInteracted) {
+      const liked = mediaData?.likes?.some(
+        (id: any) => id.toString() === user?._id
+      )
+      setIsLiked(!!liked)
+    }
 
-    setIsLiked(liked || false)
+    if (user?._id || !hasInteractedWithSave) {
+      const isInitiallySaved = user?.savedMedia?.some(
+        (id: any) => id.toString() === mediaData._id
+      )
+      setIsSaved(!!isInitiallySaved)
+    }
   }, [user?._id, mediaData])
 
   if (!mediaData) {
@@ -66,7 +91,7 @@ export default function MediaComponent({
   }
 
   return (
-    <div className=" w-full px-4  max-w-6xl">
+    <div className=" w-full px-4 max-w-6xl">
       {/* Container with glassmorphism effect */}
       <div className="w-full max-w-7xl">
         <div
@@ -76,7 +101,7 @@ export default function MediaComponent({
         >
           {/* Media Section - Left Side */}
           <div className="relative group ">
-            <div className="relative w-full pr-3 rounded-2xl overflow-hidden mx-auto">
+            <div className="relative w-full md:w-3/4 rounded-2xl overflow-hidden mx-auto">
               {/* Gradient overlay on hover */}
               <div className="absolute inset-0 bg-gradient-to-t from-black/20 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 z-10 pointer-events-none" />
 
@@ -97,7 +122,7 @@ export default function MediaComponent({
               )}
 
               {/* Floating action button */}
-              <button
+              {/* <button
                 onClick={() => setIsSaved(!isSaved)}
                 className="absolute top-4 right-4 z-20 bg-white/90 backdrop-blur-md p-3 rounded-full border-1 border-gray-300 shadow-lg hover:scale-110 transition-transform duration-200"
               >
@@ -106,7 +131,7 @@ export default function MediaComponent({
                     isSaved ? "fill-red-500 stroke-red-500" : "stroke-gray-700"
                   }`}
                 />
-              </button>
+              </button> */}
             </div>{" "}
           </div>
 
@@ -120,18 +145,26 @@ export default function MediaComponent({
                     onClick={handleLike}
                     className="p-2 hover:bg-gray-100 rounded-lg cursor-pointer"
                   >
-                    <Heart className={`${isLiked ? "fill-red-600" : ""}`} />{" "}
+                    <Heart
+                      className={`${
+                        isLiked ? "fill-red-600 text-red-600" : ""
+                      }`}
+                    />{" "}
                   </button>{" "}
-                  <span className="font-medium">
-                    {" "}
-                    {mediaData.likes?.length || 0}
-                  </span>
+                  <span className="font-medium"> {likes}</span>
                 </div>
               </div>
 
-              <button className="px-6 py-2.5 bg-red-600 cursor-pointer text-white rounded-full font-medium hover:shadow-lg hover:scale-105 transition-all duration-200">
-                Follow
-              </button>
+              <div>
+                <button
+                  onClick={handleSave}
+                  className={`px-6 mr-3 py-2.5 ${
+                    isSaved ? "bg-gray-700" : "bg-red-600"
+                  } cursor-pointer text-white rounded-full font-medium hover:shadow-lg hover:scale-105 transition-all duration-200 `}
+                >
+                  {isSaved ? "Saved" : "Save"}
+                </button>
+              </div>
             </div>
 
             {/* Title */}
