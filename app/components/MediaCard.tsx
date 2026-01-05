@@ -1,19 +1,42 @@
+import { toggleLike } from "@/actions/toggleLike"
+import { toggleSave } from "@/actions/toggleSave"
+import { useUserStore } from "@/store/useUserStore"
 import { IMediaClient } from "@/types/interfaces"
 import { Video, Image } from "@imagekit/next"
 import { Upload } from "lucide-react"
 import Link from "next/link"
-import React, { useState } from "react"
+import React, { useEffect, useState } from "react"
 
 export default function MediaCard({ item }: { item: IMediaClient }) {
-  const [IsLiked, setIsLiked] = useState(false)
   const [isSaved, setIsSaved] = useState(false)
 
-  const handleLike = () => {
-    setIsLiked(!IsLiked)
+  const [hasInteractedWithSave, setHasInteractedWithSave] = useState(false)
+
+  const { user } = useUserStore()
+
+  const handleSave = async () => {
+    setHasInteractedWithSave(true)
+    setIsSaved((prev) => !prev)
+
+    try {
+      await toggleSave({
+        mediaId: item._id!,
+        userId: user?._id!,
+      })
+    } catch (error) {
+      // rollback on failure
+      setIsSaved((prev) => !prev)
+      console.log(error)
+    }
   }
-  const handleSave = () => {
-    setIsSaved(!isSaved)
-  }
+  useEffect(() => {
+    if (user?._id || !hasInteractedWithSave) {
+      const isInitiallySaved = user?.savedMedia?.some(
+        (id: any) => id.toString() === item._id
+      )
+      setIsSaved(!!isInitiallySaved)
+    }
+  }, [user?._id, item])
   const handleDownload = () => {}
   return (
     <div
@@ -63,10 +86,7 @@ export default function MediaCard({ item }: { item: IMediaClient }) {
             </button>
           </div>
           <div className="w-full flex items-center justify-end poiSnter-events-auto">
-            <button
-              onClick={handleLike}
-              className={`p-2 rounded-xl bg-white cursor-pointer `}
-            >
+            <button className={`p-2 rounded-xl bg-white cursor-pointer `}>
               <Upload className="size-5" />
             </button>
           </div>
