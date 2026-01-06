@@ -9,7 +9,7 @@ import React, { useEffect, useState } from "react"
 
 export default function MediaCard({ item }: { item: IMediaClient }) {
   const [isSaved, setIsSaved] = useState(false)
-
+  const [isCreator, setIsCreator] = useState(false)
   const [hasInteractedWithSave, setHasInteractedWithSave] = useState(false)
 
   const { user } = useUserStore()
@@ -30,7 +30,10 @@ export default function MediaCard({ item }: { item: IMediaClient }) {
     }
   }
   useEffect(() => {
-    if (user?._id || !hasInteractedWithSave) {
+    if (user?._id) {
+      setIsCreator(item.uploadedBy.toString() === user?._id.toString())
+    }
+    if (user?._id && !hasInteractedWithSave) {
       const isInitiallySaved = user?.savedMedia?.some(
         (id: any) => id.toString() === item._id
       )
@@ -77,10 +80,13 @@ export default function MediaCard({ item }: { item: IMediaClient }) {
         <div className="w-full h-full flex flex-col justify-between items-end p-2 pointer-events-none z-20">
           <div className="w-fit pointer-events-auto">
             <button
+              disabled={isCreator}
               onClick={handleSave}
               className={`p-3 rounded-2xl  ${
-                isSaved ? "bg-gray-700" : "bg-red-600"
-              } text-white font-medium hover:scale-105 scale-95 transition-all duration-100 cursor-pointer`}
+                isSaved || isCreator ? "bg-gray-700" : "bg-red-600"
+              } ${
+                isCreator ? "cursor-not-allowed" : "cursor-pointer"
+              } text-white font-medium hover:scale-105 scale-95 transition-all duration-100`}
             >
               {isSaved ? "Saved" : "Save"}
             </button>

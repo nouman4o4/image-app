@@ -67,16 +67,18 @@ export default function MediaComponent({
     }
     getCreator()
 
-    setIsCreator(mediaData.uploadedBy.toString() === user?._id.toString())
+    if (user?._id) {
+      setIsCreator(mediaData.uploadedBy.toString() === user?._id.toString())
+    }
 
-    if (user?._id || !hasInteracted) {
+    if (user?._id && !hasInteracted) {
       const liked = mediaData?.likes?.some(
         (id: any) => id.toString() === user?._id
       )
       setIsLiked(!!liked)
     }
 
-    if (user?._id || !hasInteractedWithSave) {
+    if (user?._id && !hasInteractedWithSave) {
       const isInitiallySaved = user?.savedMedia?.some(
         (id: any) => id.toString() === mediaData._id
       )
@@ -157,10 +159,13 @@ export default function MediaComponent({
 
               <div>
                 <button
+                  disabled={isCreator}
                   onClick={handleSave}
                   className={`px-6 mr-3 py-2.5 ${
-                    isSaved ? "bg-gray-700" : "bg-red-600"
-                  } cursor-pointer text-white rounded-full font-medium hover:shadow-lg hover:scale-105 transition-all duration-200 `}
+                    isSaved || isCreator ? "bg-gray-700" : "bg-red-600"
+                  } ${
+                    isCreator ? "cursor-not-allowed" : " cursor-pointer"
+                  } text-white rounded-full font-medium hover:shadow-lg hover:scale-105 transition-all duration-200 `}
                 >
                   {isSaved ? "Saved" : "Save"}
                 </button>
@@ -204,7 +209,7 @@ export default function MediaComponent({
               </div>
             </div>
             {/* Comments section */}
-            <CommentsSection />
+            <CommentsSection mediaId={mediaData._id!} />
           </div>
         </div>
       </div>
