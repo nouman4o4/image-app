@@ -9,6 +9,14 @@ export const VIDEO_DIMENSIONS = {
   heihgt: 1920,
 } as const
 
+export interface IComment {
+  _id?: Types.ObjectId
+  content: string
+  user: Types.ObjectId
+  likes: Types.ObjectId[]
+  createdAt?: Date
+}
+
 export interface IMedia {
   title: string
   fileType: string
@@ -24,6 +32,7 @@ export interface IMedia {
   uploadedBy: Types.ObjectId
   category: string
   likes: Types.ObjectId[]
+  comments: IComment[]
 }
 export type IMediaDocument = IMedia & Document
 // ---------------------
@@ -51,6 +60,26 @@ const MediaSchema: Schema<IMediaDocument> = new Schema<IMediaDocument>(
       {
         type: mongoose.Schema.Types.ObjectId,
         ref: "User",
+      },
+    ],
+    comments: [
+      {
+        content: { type: String, required: true, trim: true },
+        user: {
+          type: mongoose.Schema.Types.ObjectId,
+          ref: "User",
+          required: true,
+        },
+        likes: [
+          {
+            type: mongoose.Schema.Types.ObjectId,
+            ref: "User",
+          },
+        ],
+        createdAt: {
+          type: Date,
+          default: Date.now,
+        },
       },
     ],
   },
