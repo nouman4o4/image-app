@@ -27,6 +27,7 @@ export default function CommentsSection({ mediaId }: { mediaId: string }) {
   const [content, setContent] = useState<string>("")
   const [commentLoading, setCommentsLoading] = useState(false)
   const { user } = useUserStore()
+  const [isCommentsShown, setIsCommentsShown] = useState(false)
 
   const handleCreateComment = async () => {
     if (content.length === 0) {
@@ -41,7 +42,7 @@ export default function CommentsSection({ mediaId }: { mediaId: string }) {
         mediaId,
       })
 
-      comments.push({
+      const newCommment = {
         ...createdComment,
         user: {
           _id: user._id,
@@ -49,11 +50,13 @@ export default function CommentsSection({ mediaId }: { mediaId: string }) {
           lastname: user.lastname,
           profileImage: { imageUrl: user.profileImage?.imageUrl },
         },
-      })
+      }
+      setComments((prev) => [...prev, newCommment])
       setContent("")
       toast.success("Comment added")
     } catch (error) {
-      comments.pop()
+      setComments((prev) => prev.filter((_, i) => i !== comments.length - 1))
+
       console.log(error)
     }
   }
@@ -106,8 +109,15 @@ export default function CommentsSection({ mediaId }: { mediaId: string }) {
             <h2 className="text-lg font-semibold text-gray-900 mb-4">
               <span>{comments.length}</span> Comments
             </h2>
-            <button className="cursor-pointer">
-              <ChevronDown className="size-7 hover:bg-gray-200 rounded p-1" />
+            <button
+              onClick={() => setIsCommentsShown(!isCommentsShown)}
+              className="cursor-pointer"
+            >
+              <ChevronDown
+                className={`size-7 hover:bg-gray-200 rounded p-1 transition-transform duration-100 ${
+                  isCommentsShown ? "rotate-180" : "rotate-0"
+                }`}
+              />
             </button>
           </>
         ) : (
@@ -115,14 +125,51 @@ export default function CommentsSection({ mediaId }: { mediaId: string }) {
         )}
       </div>
 
-      {/* Dummy Comments */}
-      <div className="space-y-4">
+      {/* Comments */}
+      <div className="space-y-4 transition-all duration-100 max-h-50 md:max-h-56 lg:max-h-72 overflow-y-auto">
         {commentLoading ? (
           <div>Loading...</div>
+        ) : isCommentsShown ? (
+          comments?.map((comment, index) => {
+            return (
+              <div
+                key={comment._id}
+                className="flex items-center justify-between space-x-3 bg-gray-100 rounded-lg p-2"
+              >
+                <div className="flex items-start space-x-3">
+                  <div className="w-10 h-10 rounded-full overflow-hidden bg-gray-300 text-white font-bold">
+                    <Image
+                      className="w-full h-full object-cover"
+                      alt="Profile"
+                      src={comment.user?.profileImage?.imageUrl || ""}
+                      width={50}
+                      height={50}
+                    />
+                  </div>
+                  <div>
+                    <p className="text-gray-900 font-medium">
+                      {comment.user.firstname} {comment.user.lastname}
+                    </p>
+                    <p className="text-gray-600">{comment.content}</p>
+                  </div>
+                </div>
+                {comment.user._id === user?._id ? (
+                  <button
+                    onClick={() => handleDeleteComment(comment._id, index)}
+                    className="p-1 rounded cursor-pointer text-red-600 hover:bg-red-600 hover:text-white tranistion-all ease-in duration-150 "
+                  >
+                    <Trash2 className="size-5 " />
+                  </button>
+                ) : (
+                  ""
+                )}
+              </div>
+            )
+          })
         ) : (
-          comments?.map((comment, index) => (
+          comments.length > 0 && (
             <div
-              key={comment._id}
+              key={comments[0]._id}
               className="flex items-center justify-between space-x-3 bg-gray-100 rounded-lg p-2"
             >
               <div className="flex items-start space-x-3">
@@ -130,21 +177,21 @@ export default function CommentsSection({ mediaId }: { mediaId: string }) {
                   <Image
                     className="w-full h-full object-cover"
                     alt="Profile"
-                    src={comment.user?.profileImage?.imageUrl || ""}
+                    src={comments[0].user?.profileImage?.imageUrl || ""}
                     width={50}
                     height={50}
                   />
                 </div>
                 <div>
                   <p className="text-gray-900 font-medium">
-                    {comment.user.firstname} {comment.user.lastname}
+                    {comments[0].user.firstname} {comments[0].user.lastname}
                   </p>
-                  <p className="text-gray-600">{comment.content}</p>
+                  <p className="text-gray-600">{comments[0].content}</p>
                 </div>
               </div>
-              {comment.user._id.toString() === user?._id ? (
+              {comments[0].user._id.toString() === user?._id ? (
                 <button
-                  onClick={() => handleDeleteComment(comment._id, index)}
+                  onClick={() => handleDeleteComment(comments[0]._id, 0)}
                   className="p-1 rounded cursor-pointer text-red-600 hover:bg-red-600 hover:text-white tranistion-all ease-in duration-150 "
                 >
                   <Trash2 className="size-5 " />
@@ -153,7 +200,7 @@ export default function CommentsSection({ mediaId }: { mediaId: string }) {
                 ""
               )}
             </div>
-          ))
+          )
         )}
       </div>
 
