@@ -3,9 +3,10 @@ import { toggleSave } from "@/actions/toggleSave"
 import { useUserStore } from "@/store/useUserStore"
 import { IMediaClient } from "@/types/interfaces"
 import { Video, Image } from "@imagekit/next"
-import { Upload } from "lucide-react"
+import { Trash2, Upload } from "lucide-react"
 import Link from "next/link"
 import React, { useEffect, useState } from "react"
+import { usePathname } from "next/navigation"
 
 export default function MediaCard({ item }: { item: IMediaClient }) {
   const [isSaved, setIsSaved] = useState(false)
@@ -13,6 +14,9 @@ export default function MediaCard({ item }: { item: IMediaClient }) {
   const [hasInteractedWithSave, setHasInteractedWithSave] = useState(false)
 
   const { user } = useUserStore()
+
+  const pathname = usePathname()
+  const isProfilePage = pathname.startsWith("/profile")
 
   const handleSave = async () => {
     setHasInteractedWithSave(true)
@@ -28,6 +32,9 @@ export default function MediaCard({ item }: { item: IMediaClient }) {
       setIsSaved((prev) => !prev)
       console.log(error)
     }
+  }
+  const handleDeleteMedia = () => {
+    window.prompt("Do you realy want to delete")
   }
   useEffect(() => {
     if (user?._id) {
@@ -95,6 +102,14 @@ export default function MediaCard({ item }: { item: IMediaClient }) {
             <button className={`p-2 rounded-xl bg-white cursor-pointer `}>
               <Upload className="size-5" />
             </button>
+            {isProfilePage && isCreator && (
+              <button
+                onClick={handleDeleteMedia}
+                className="p-2 rounded-full text-red-600 hover:bg-red-600 hover:text-white transition"
+              >
+                <Trash2 className="size-5" />
+              </button>
+            )}
           </div>
         </div>
       </div>
