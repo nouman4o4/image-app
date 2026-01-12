@@ -33,6 +33,7 @@ export interface IMedia {
   category: string
   likes: Types.ObjectId[]
   comments: IComment[]
+  fileId: string
 }
 export type IMediaDocument = IMedia & Document
 // ---------------------
@@ -82,6 +83,9 @@ const MediaSchema: Schema<IMediaDocument> = new Schema<IMediaDocument>(
         },
       },
     ],
+    fileId: {
+      type: String,
+    },
   },
   { timestamps: true }
 )

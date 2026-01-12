@@ -13,6 +13,7 @@ export interface IMediaClient {
   uploadedBy: string
   _id?: string
   likes?: string[]
+  fileId: string
 }
 
 export interface IUserClient {
