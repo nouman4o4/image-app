@@ -7,6 +7,8 @@ import { Trash2, Upload } from "lucide-react"
 import Link from "next/link"
 import React, { useEffect, useState } from "react"
 import { usePathname } from "next/navigation"
+import toast from "react-hot-toast"
+import { deleteMedia } from "@/actions/deleteMedia"
 
 export default function MediaCard({ item }: { item: IMediaClient }) {
   const [isSaved, setIsSaved] = useState(false)
@@ -33,9 +35,25 @@ export default function MediaCard({ item }: { item: IMediaClient }) {
       console.log(error)
     }
   }
-  const handleDeleteMedia = () => {
-    window.prompt("Do you realy want to delete")
+  const handleDeleteMedia = async () => {
+    if (!user?._id) return
+
+    const confirmDelete = confirm("Are you sure you want to delete this post?")
+    if (!confirmDelete) return
+
+    const result = await deleteMedia({
+      mediaId: item._id!,
+      userId: user._id,
+    })
+
+    if (!result.success) {
+      toast.error("Failed to delete media")
+      return
+    }
+
+    toast.success("Media deleted")
   }
+
   useEffect(() => {
     if (user?._id) {
       setIsCreator(item.uploadedBy.toString() === user?._id.toString())
@@ -85,7 +103,7 @@ export default function MediaCard({ item }: { item: IMediaClient }) {
 
       <div className="buttons-overlay-div absolute inset-0 z-10 opacity-0 group-hover:opacity-100 transition-opacity duration-100 bg-black/10 cursor-pointer pointer-events-none">
         <div className="w-full h-full flex flex-col justify-between items-end p-2 pointer-events-none z-20">
-          <div className="w-fit pointer-events-auto">
+          <div className="w-fit pointer-events-auto ">
             <button
               disabled={isCreator}
               onClick={handleSave}
@@ -98,14 +116,14 @@ export default function MediaCard({ item }: { item: IMediaClient }) {
               {isSaved ? "Saved" : "Save"}
             </button>
           </div>
-          <div className="w-full flex items-center justify-end poiSnter-events-auto">
+          <div className="w-full flex items-center justify-end pointer-events-auto">
             <button className={`p-2 rounded-xl bg-white cursor-pointer `}>
               <Upload className="size-5" />
             </button>
             {isProfilePage && isCreator && (
               <button
                 onClick={handleDeleteMedia}
-                className="p-2 rounded-full text-red-600 hover:bg-red-600 hover:text-white transition"
+                className="p-2 rounded-xl ml-2 text-red-600 bg-white z-20 hover:bg-red-600 hover:text-white transition cursor-pointer"
               >
                 <Trash2 className="size-5" />
               </button>

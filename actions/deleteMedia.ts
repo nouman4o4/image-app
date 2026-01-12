@@ -1,15 +1,10 @@
 "use server"
 
 import { connectDB } from "@/lib/db"
-import Media from "@/models/media.model"
-import ImageKit from "imagekit"
-import { revalidatePath } from "next/cache"
+import { deleteImageKitFile } from "@/lib/imageKitDeleteFile"
+import { Media } from "@/models/media.model"
 
-const imagekit = new ImageKit({
-  publicKey: process.env.IMAGEKIT_PUBLIC_KEY!,
-  privateKey: process.env.IMAGEKIT_PRIVATE_KEY!,
-  urlEndpoint: process.env.IMAGEKIT_URL_ENDPOINT!,
-})
+import { revalidatePath } from "next/cache"
 
 interface DeleteMediaParams {
   mediaId: string
@@ -33,7 +28,7 @@ export async function deleteMedia({ mediaId, userId }: DeleteMediaParams) {
 
     // 🗑 Delete from ImageKit
     if (media.fileId) {
-      await imagekit.deleteFile(media.fileId)
+      await deleteImageKitFile(media.fileId)
     }
 
     // 🗑 Delete from DB

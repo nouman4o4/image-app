@@ -84,6 +84,7 @@ export default function FileUpload() {
           height: uploadResponse.height,
         },
         uploadedBy: session?.user._id!,
+        fileId: uploadResponse.fileId,
       }
 
       const response = await fetch("/api/media", {
