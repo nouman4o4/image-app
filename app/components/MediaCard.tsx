@@ -7,10 +7,15 @@ import { Trash2, Upload } from "lucide-react"
 import Link from "next/link"
 import React, { useEffect, useState } from "react"
 import { usePathname } from "next/navigation"
-import toast from "react-hot-toast"
-import { deleteMedia } from "@/actions/deleteMedia"
+import { useRouter } from "next/navigation"
 
-export default function MediaCard({ item }: { item: IMediaClient }) {
+export default function MediaCard({
+  item,
+  onDelete,
+}: {
+  item: IMediaClient
+  onDelete?: (mediaId: string) => void
+}) {
   const [isSaved, setIsSaved] = useState(false)
   const [isCreator, setIsCreator] = useState(false)
   const [hasInteractedWithSave, setHasInteractedWithSave] = useState(false)
@@ -35,24 +40,6 @@ export default function MediaCard({ item }: { item: IMediaClient }) {
       console.log(error)
     }
   }
-  const handleDeleteMedia = async () => {
-    if (!user?._id) return
-
-    const confirmDelete = confirm("Are you sure you want to delete this post?")
-    if (!confirmDelete) return
-
-    const result = await deleteMedia({
-      mediaId: item._id!,
-      userId: user._id,
-    })
-
-    if (!result.success) {
-      toast.error("Failed to delete media")
-      return
-    }
-
-    toast.success("Media deleted")
-  }
 
   useEffect(() => {
     if (user?._id) {
@@ -65,7 +52,7 @@ export default function MediaCard({ item }: { item: IMediaClient }) {
       setIsSaved(!!isInitiallySaved)
     }
   }, [user?._id, item])
-  const handleDownload = () => {}
+
   return (
     <div
       key={item._id}
@@ -120,9 +107,9 @@ export default function MediaCard({ item }: { item: IMediaClient }) {
             <button className={`p-2 rounded-xl bg-white cursor-pointer `}>
               <Upload className="size-5" />
             </button>
-            {isProfilePage && isCreator && (
+            {isProfilePage && isCreator && onDelete && (
               <button
-                onClick={handleDeleteMedia}
+                onClick={() => onDelete(item._id!)}
                 className="p-2 rounded-xl ml-2 text-red-600 bg-white z-20 hover:bg-red-600 hover:text-white transition cursor-pointer"
               >
                 <Trash2 className="size-5" />

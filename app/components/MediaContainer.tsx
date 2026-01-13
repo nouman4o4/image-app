@@ -4,14 +4,19 @@ import Link from "next/link"
 import { usePathname } from "next/navigation"
 import MediaCard from "./MediaCard"
 
+interface IMediaContainer {
+  media: IMediaClient[]
+  isLoading: boolean
+  onDelete?: (mediaId: string) => void
+}
+
 export default function MediaContainer({
   media,
   isLoading,
-}: {
-  media: IMediaClient[]
-  isLoading: boolean
-}) {
+  onDelete,
+}: IMediaContainer) {
   const pathName = usePathname()
+
   if (isLoading) {
     return (
       <div className="w-full min-h-[70vh] bg-gray-100 rounded-xl p-8 flex justify-center items-center">
@@ -43,7 +48,7 @@ export default function MediaContainer({
       <div className="columns-2 sm:columns-2 md:columns-3 lg:columns-4 xl:columns-5 gap-4 space-y-4">
         {media.map((item) => (
           <div className="" key={item._id}>
-            <MediaCard item={item} />
+            <MediaCard onDelete={onDelete} item={item} />
           </div>
         ))}
       </div>

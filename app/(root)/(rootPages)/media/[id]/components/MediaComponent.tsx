@@ -9,6 +9,8 @@ import {
   MoreHorizontal,
   Bookmark,
   ExternalLink,
+  DownloadCloud,
+  ArrowDownToLine,
 } from "lucide-react"
 import { IMediaClient, IUserClient } from "@/types/interfaces"
 import Image from "next/image"
@@ -19,6 +21,8 @@ import { getUserData } from "@/actions/userActions"
 import { useSession } from "next-auth/react"
 import { toggleLike } from "@/actions/toggleLike"
 import { toggleSave } from "@/actions/toggleSave"
+import { HiDocumentDownload, HiOutlineDocumentDownload } from "react-icons/hi"
+import toast from "react-hot-toast"
 
 export default function MediaComponent({
   mediaData,
@@ -57,6 +61,28 @@ export default function MediaComponent({
       // rollback on failure
       setIsSaved((prev) => !prev)
       console.log(error)
+    }
+  }
+
+  const handleDownload = async (url: string, filename: string) => {
+    try {
+      const response = await fetch(url)
+      const blob = await response.blob()
+
+      const blobUrl = window.URL.createObjectURL(blob)
+
+      const a = document.createElement("a")
+      a.href = blobUrl
+      a.download = filename
+      document.body.appendChild(a)
+      a.click()
+
+      document.body.removeChild(a)
+      window.URL.revokeObjectURL(blobUrl)
+      toast.success("Pin downloaded successfully")
+    } catch (error) {
+      console.error("Download failed:", error)
+      alert("Failed to download file")
     }
   }
 
@@ -141,7 +167,7 @@ export default function MediaComponent({
           <div className="flex flex-col gap-6">
             {/* Header Actions */}
             <div className="flex items-center justify-between">
-              <div className="flex">
+              <div className="flex gap-4">
                 <div className="flex items-center">
                   <button
                     onClick={handleLike}
@@ -154,6 +180,20 @@ export default function MediaComponent({
                     />{" "}
                   </button>{" "}
                   <span className="font-medium"> {likes}</span>
+                </div>
+                <div className="flex items-center">
+                  <button
+                    onClick={() =>
+                      handleDownload(mediaData.mediaUrl, mediaData.title)
+                    }
+                    className="p-2 hover:bg-gray-100 rounded-lg cursor-pointer"
+                  >
+                    <ArrowDownToLine
+                      className={`${
+                        isLiked ? "fill-red-600 text-red-600" : ""
+                      }`}
+                    />
+                  </button>
                 </div>
               </div>
 
@@ -185,7 +225,7 @@ export default function MediaComponent({
             </div>
             <div>
               <div className="flex items-center gap-3">
-                <div className="w-12 h-12 bg-gradient-to-br overflow-hidden from-purple-500 to-pink-500 rounded-full flex items-center justify-center text-white font-bold shadow-md">
+                <div className="w-12 h-12 bg-gradient-to-br overflow-hidden bg-gray-400 rounded-full flex items-center justify-center text-white font-bold shadow-md">
                   {creator?.profileImage ? (
                     <Image
                       className="w-full h-full object-cover"

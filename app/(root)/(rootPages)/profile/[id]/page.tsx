@@ -12,6 +12,8 @@ import {
 import { useParams } from "next/navigation"
 import { useUserStore } from "@/store/useUserStore"
 import Image from "next/image"
+import { deleteMedia } from "@/actions/deleteMedia"
+import toast from "react-hot-toast"
 
 export default function ProfilePage() {
   const [activeTab, setActiveTab] = useState<"created" | "saved">("created")
@@ -24,6 +26,28 @@ export default function ProfilePage() {
   const params = useParams()
   const userId = Array.isArray(params.id) ? params.id[0] : params.id
   const { user, setUser } = useUserStore()
+
+  const handleDeleteMedia = async (mediaId: string) => {
+    if (!user?._id) return
+
+    const confirmDelete = confirm("Are you sure you want to delete this post?")
+    if (!confirmDelete) return
+    const deletedMedia = media.find((m) => m._id === mediaId)
+    if (!deletedMedia) return
+    setMedia((prev) => prev.filter((m) => m._id !== mediaId))
+    const result = await deleteMedia({
+      mediaId: mediaId!,
+      userId: user._id,
+    })
+
+    if (!result.success) {
+      toast.error("Failed to delete media")
+      setMedia((prev) => [...prev, deletedMedia])
+      return
+    }
+
+    toast.success("Media deleted")
+  }
   useEffect(() => {
     const fetchData = async () => {
       if (!userId) return
@@ -88,10 +112,10 @@ export default function ProfilePage() {
 
           {/* Stats */}
           <div className="flex items-center justify-center space-x-8 mb-6">
-            {/* <div className="text-center">
+            <div className="text-center">
               <p className="text-2xl font-bold text-gray-900">{media.length}</p>
               <p className="text-sm text-gray-600">Pins</p>
-            </div> */}
+            </div>
             <div className="text-center">
               <p className="text-2xl font-bold text-gray-900">
                 {userData?.followers?.length || 0}
@@ -147,7 +171,11 @@ export default function ProfilePage() {
         {/* Media Section */}
         <div>
           {activeTab === "created" ? (
-            <MediaContainer media={media} isLoading={createdLoading} />
+            <MediaContainer
+              onDelete={handleDeleteMedia}
+              media={media}
+              isLoading={createdLoading}
+            />
           ) : (
             <MediaContainer media={savedMedia} isLoading={savedLoading} />
           )}
