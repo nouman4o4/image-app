@@ -3,11 +3,9 @@ import type { Metadata } from "next"
 import "./globals.css"
 import { Toaster } from "react-hot-toast"
 import Providers from "./providers/Providers"
-// import Navbar from "./components/Navbar"
-import dynamic from "next/dynamic"
-
-const Navbar = dynamic(() => import("./components/Navbar"), { ssr: false })
+import Navbar from "./components/Navbar"
 import { AuthUserLoader } from "./components/AuthUserLoader"
+import { Suspense } from "react"
 
 // const geistSans = Geist({
 //   variable: "--font-geist-sans",
@@ -35,7 +33,9 @@ export default function RootLayout({
         <Toaster />
         <Providers>
           <AuthUserLoader>
-            <Navbar />
+            <Suspense fallback={<div className="h-16 bg-gray-100" />}>
+              <Navbar />
+            </Suspense>
             <div className="mt-20 relative ">{children}</div>
           </AuthUserLoader>
         </Providers>
