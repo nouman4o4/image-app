@@ -90,6 +90,11 @@ const MediaSchema: Schema<IMediaDocument> = new Schema<IMediaDocument>(
   { timestamps: true }
 )
 
+MediaSchema.index({
+  title: "text",
+  description: "text",
+})
+
 // ---------------------
 // Model
 // ---------------------
