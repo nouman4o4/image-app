@@ -3,7 +3,10 @@ import type { Metadata } from "next"
 import "./globals.css"
 import { Toaster } from "react-hot-toast"
 import Providers from "./providers/Providers"
-import Navbar from "./components/Navbar"
+// import Navbar from "./components/Navbar"
+import dynamic from "next/dynamic"
+
+const Navbar = dynamic(() => import("./components/Navbar"), { ssr: false })
 import { AuthUserLoader } from "./components/AuthUserLoader"
 
 // const geistSans = Geist({

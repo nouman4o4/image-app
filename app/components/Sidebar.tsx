@@ -60,8 +60,6 @@ export default function Sidebar() {
 
   useEffect(() => {
     if (pathname === "/") setActiveItem("home")
-    console.log({ pathname })
-    console.log({ activeItem })
   }, [pathname])
 
   return (
