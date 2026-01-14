@@ -8,7 +8,7 @@ import { useUserStore } from "@/store/useUserStore"
 import Image from "next/image"
 import FullLogo from "./FullLogo"
 import Link from "next/link"
-import { useRouter, useSearchParams } from "next/navigation"
+import { usePathname, useRouter, useSearchParams } from "next/navigation"
 
 export default function Navbar() {
   const [isMenuOpen, setIsMenuOpen] = useState(false)
@@ -18,7 +18,7 @@ export default function Navbar() {
   const { data: session } = useSession()
   const { user, clearUser } = useUserStore()
   const searchParams = useSearchParams()
-
+  const pathname = usePathname()
   const dropDownMenuRef = useRef<HTMLDivElement>(null)
   const chevronRef = useRef<HTMLButtonElement>(null)
 
@@ -52,13 +52,15 @@ export default function Navbar() {
     const q = searchParams.get("q")
     if (q) {
       setSearchQuery(q)
+      return
     }
-  }, [searchParams])
+    if (!pathname.startsWith("/search")) setSearchQuery("")
+  }, [searchParams, pathname])
 
   return (
     <nav
       className={`fixed w-full top-0 left-0 right-0 ${
-        user ? "pl-20" : ""
+        user ? "pl-[60px] lg:pl-20" : ""
       } z-50 bg-white shadow-sm border-b border-gray-200`}
     >
       <div className="w-full h-full p-4 flex gap-5 items-center">
@@ -72,14 +74,13 @@ export default function Navbar() {
         {/* Serach */}
         <form
           onSubmit={handleSearchSubmit}
-          className="group grow h-full focus-within:ring-2 ring-blue-300 bg-gray-200 relative pl-5 py-3 rounded-full overflow-hidden"
+          className="group grow h-full focus-within:ring-2 ring-blue-300 bg-gray-200 relative pl-5 py-3 rounded-xl overflow-hidden"
         >
           <Search className="absolute left-3 size-5 top-1/2 -translate-y-1/2 text-gray-700" />
           <input
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.currentTarget.value)}
             type="text"
-            name=""
             onFocus={() => setIsFocused(true)}
             onBlur={() => setIsFocused(false)}
             id=""

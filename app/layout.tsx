@@ -4,8 +4,6 @@ import "./globals.css"
 import { Toaster } from "react-hot-toast"
 import Providers from "./providers/Providers"
 import Navbar from "./components/Navbar"
-import Sidebar from "./components/Sidebar"
-import Label from "./components/Label"
 import { AuthUserLoader } from "./components/AuthUserLoader"
 
 // const geistSans = Geist({
@@ -36,9 +34,6 @@ export default function RootLayout({
           <AuthUserLoader>
             <Navbar />
             <div className="mt-20 relative ">{children}</div>
-            <div className="fixed top-4 right-4 z-50">
-              <Label />
-            </div>
           </AuthUserLoader>
         </Providers>
       </body>

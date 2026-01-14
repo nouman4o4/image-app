@@ -2,15 +2,7 @@
 
 import { useEffect, useState } from "react"
 import Link from "next/link"
-import {
-  Bell,
-  Home,
-  ImagePlusIcon,
-  Plus,
-  User,
-  User2,
-  PlusSquare,
-} from "lucide-react"
+import { Bell, Home, User2, PlusSquare } from "lucide-react"
 import { useUserStore } from "@/store/useUserStore"
 import { useSession } from "next-auth/react"
 import NLogo from "./NLogo"
@@ -21,7 +13,6 @@ export default function Sidebar() {
   const { user } = useUserStore()
   const { data: session } = useSession()
   const pathname = usePathname()
-  console.log(pathname)
 
   const menuItems = [
     {
@@ -74,7 +65,7 @@ export default function Sidebar() {
   }, [pathname])
 
   return (
-    <aside className="fixed left-0 top-0 h-screen w-[80px] pt-3 bg-white border-r border-gray-200 flex flex-col gap-6 items-center py-2 z-50">
+    <aside className="fixed left-0 top-0 h-screen w-[60px] md:w-[80px] pt-3 bg-white border-r border-gray-200 flex flex-col gap-6 items-center py-2 z-50">
       {menuItems.map((item) => (
         <Link
           key={item.id}

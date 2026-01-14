@@ -1,8 +1,10 @@
+"use client"
 import { IMediaClient } from "@/types/interfaces"
 
 import Link from "next/link"
 import { usePathname } from "next/navigation"
 import MediaCard from "./MediaCard"
+import MediaSkeleton from "./MediaSkeleton"
 
 interface IMediaContainer {
   media: IMediaClient[]
@@ -18,13 +20,7 @@ export default function MediaContainer({
   const pathName = usePathname()
 
   if (isLoading) {
-    return (
-      <div className="w-full min-h-[70vh] bg-gray-100 rounded-xl p-8 flex justify-center items-center">
-        <h1 className="text-xl font-medium text-gray-600">
-          Loading, please wait...
-        </h1>
-      </div>
-    )
+    return <MediaSkeleton count={12} />
   }
 
   if (!isLoading && media.length === 0) {
@@ -44,7 +40,7 @@ export default function MediaContainer({
   }
 
   return (
-    <div className="w-full min-h-[70vh]">
+    <div className="w-full">
       <div className="columns-2 sm:columns-2 md:columns-3 lg:columns-4 xl:columns-5 gap-4 space-y-4">
         {media.map((item) => (
           <div className="" key={item._id}>

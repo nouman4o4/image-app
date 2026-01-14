@@ -16,7 +16,9 @@ export default function Layout({ children }: { children: React.ReactNode }) {
       ) : (
         ""
       )}
-      <div className={`${user ? "ml-20" : ""}`}>{children}</div>
+      <div className={`${user ? "ml-[60px] md:ml-[80px]" : ""}`}>
+        {children}
+      </div>
     </div>
   )
 }

@@ -34,7 +34,7 @@ export default function Home() {
   }, [])
 
   return (
-    <div className="w-full min-h-screen p-8 bg-gray-50">
+    <div className="w-full min-h-screen p-4 md:p-8">
       <div className="h-full">
         <MediaContainer isLoading={loading} media={media ?? []} />
       </div>

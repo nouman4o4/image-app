@@ -74,21 +74,21 @@ export default function ProfilePage() {
   }
 
   return (
-    <div className="min-h-screen bg-white">
-      <div className=" mx-auto px-4 py-12">
+    <div className="bg-white">
+      <div className="mx-auto px-4 py-12">
         {/* Profile Header */}
         <div className="text-center mb-8">
           <div className="relative inline-block mb-4 w-32 h-32 rounded-full overflow-hidden">
             {userData?.profileImage?.imageUrl ? (
               <Image
-                className="w-full object-cover"
+                className="w-full h-full object-cover"
                 src={userData.profileImage.imageUrl}
                 alt="UserProfileImage"
                 width={100}
                 height={100}
               />
             ) : (
-              <div className="w-full h-full bg-gradient-to-br from-purple-400 via-pink-400 to-red-400 flex items-center justify-center text-white text-4xl font-bold shadow-lg">
+              <div className="w-full h-full bg-gradient-to-br bg-gray-300 flex items-center justify-center text-white text-4xl font-bold shadow-lg">
                 {userData?.firstname?.[0]} {userData?.lastname?.[0]}
               </div>
             )}
