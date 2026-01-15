@@ -1,5 +1,6 @@
 "use server"
 
+import { connectDB } from "@/lib/db"
 import { User } from "@/models/user.model"
 import mongoose from "mongoose"
 
@@ -16,26 +17,32 @@ export async function toggleSave({ mediaId, userId }: ToggleSaveArgs) {
     throw new Error("Invalid IDs")
   }
 
-  const user = await User.findById(userId)
-  if (!user) throw new Error("User not found")
+  try {
+    await connectDB()
+    const user = await User.findById(userId)
+    if (!user) throw new Error("User not found")
 
-  const alreadySaved = user.savedMedia?.some(
-    (id: string) => id.toString() === mediaId
-  )
+    const alreadySaved = user.savedMedia?.some(
+      (id: string) => id.toString() === mediaId
+    )
 
-  if (alreadySaved) {
-    // -------- UNSAVE --------
-    await User.findByIdAndUpdate(userId, {
-      $pull: { savedMedia: mediaId },
-    })
+    if (alreadySaved) {
+      // -------- UNSAVE --------
+      await User.findByIdAndUpdate(userId, {
+        $pull: { savedMedia: mediaId },
+      })
 
-    return { saved: false }
-  } else {
-    // -------- SAVE --------
-    await User.findByIdAndUpdate(userId, {
-      $addToSet: { savedMedia: mediaId },
-    })
+      return { saved: false }
+    } else {
+      // -------- SAVE --------
+      await User.findByIdAndUpdate(userId, {
+        $addToSet: { savedMedia: mediaId },
+      })
 
-    return { saved: true }
+      return { saved: true }
+    }
+  } catch (error) {
+    console.log(error)
+    return false
   }
 }

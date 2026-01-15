@@ -14,6 +14,7 @@ import { useUserStore } from "@/store/useUserStore"
 import Image from "next/image"
 import { deleteMedia } from "@/actions/deleteMedia"
 import toast from "react-hot-toast"
+import { unsaveMedia } from "@/actions/unsaveMedia"
 
 export default function ProfilePage() {
   const [activeTab, setActiveTab] = useState<"created" | "saved">("created")
@@ -48,6 +49,37 @@ export default function ProfilePage() {
 
     toast.success("Media deleted")
   }
+
+  const handleUnsave = async (mediaId: string) => {
+    if (!user?._id) return
+
+    const unSavedMedia = savedMedia.find((m) => m._id === mediaId)
+    if (!unSavedMedia) return
+
+    try {
+      setSavedMedia((prev) => prev.filter((m) => m._id !== mediaId))
+      setUser({
+        ...user,
+        savedMedia: user.savedMedia?.filter((id) => id !== mediaId),
+      })
+      const result = await unsaveMedia({
+        mediaId: mediaId!,
+        userId: user._id,
+      })
+
+      if (!result) {
+        toast.error("Failed to unsave media")
+        setMedia((prev) => [...prev, unSavedMedia])
+        return
+      }
+
+      toast.success("Media unsaved")
+    } catch (error) {
+      toast.error("Failed to unsave media")
+      setSavedMedia((prev) => [...prev, unSavedMedia])
+    }
+  }
+
   useEffect(() => {
     const fetchData = async () => {
       if (!userId) return
@@ -177,7 +209,11 @@ export default function ProfilePage() {
               isLoading={createdLoading}
             />
           ) : (
-            <MediaContainer media={savedMedia} isLoading={savedLoading} />
+            <MediaContainer
+              onUnsave={handleUnsave}
+              media={savedMedia}
+              isLoading={savedLoading}
+            />
           )}
         </div>
       </div>

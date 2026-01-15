@@ -10,12 +10,14 @@ interface IMediaContainer {
   media: IMediaClient[]
   isLoading: boolean
   onDelete?: (mediaId: string) => void
+  onUnsave?: (mediaId: string) => void
 }
 
 export default function MediaContainer({
   media,
   isLoading,
   onDelete,
+  onUnsave,
 }: IMediaContainer) {
   const pathName = usePathname()
 
@@ -32,7 +34,7 @@ export default function MediaContainer({
             href="/upload"
             className="px-4 py-2 rounded bg-gray-300 font-semibold"
           >
-            Upload one?
+            Upload one? here
           </Link>
         )}
       </div>
@@ -44,7 +46,7 @@ export default function MediaContainer({
       <div className="columns-2 sm:columns-2 md:columns-3 lg:columns-4 xl:columns-5 gap-4 space-y-4">
         {media.map((item) => (
           <div className="" key={item._id}>
-            <MediaCard onDelete={onDelete} item={item} />
+            <MediaCard onUnsave={onUnsave} onDelete={onDelete} item={item} />
           </div>
         ))}
       </div>
