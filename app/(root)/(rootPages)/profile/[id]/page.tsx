@@ -15,6 +15,7 @@ import Image from "next/image"
 import { deleteMedia } from "@/actions/deleteMedia"
 import toast from "react-hot-toast"
 import { unsaveMedia } from "@/actions/unsaveMedia"
+import ConfirmDeleteModal from "@/app/components/ConfirmtDeleteModal"
 
 export default function ProfilePage() {
   const [activeTab, setActiveTab] = useState<"created" | "saved">("created")
@@ -23,31 +24,45 @@ export default function ProfilePage() {
   const [savedMedia, setSavedMedia] = useState<IMediaClient[]>([])
   const [createdLoading, setCreatedLoading] = useState(true)
   const [savedLoading, setSavedLoading] = useState(false)
+  const [isDeleting, setIsDeleting] = useState(false)
+  const [isDeleteOpen, setIsDeleteOpen] = useState(false)
+  const [mediaId, setMediaId] = useState("")
 
   const params = useParams()
   const userId = Array.isArray(params.id) ? params.id[0] : params.id
   const { user, setUser } = useUserStore()
 
-  const handleDeleteMedia = async (mediaId: string) => {
+  const handleDeleteMedia = async () => {
     if (!user?._id) return
-
-    const confirmDelete = confirm("Are you sure you want to delete this post?")
-    if (!confirmDelete) return
     const deletedMedia = media.find((m) => m._id === mediaId)
     if (!deletedMedia) return
-    setMedia((prev) => prev.filter((m) => m._id !== mediaId))
-    const result = await deleteMedia({
-      mediaId: mediaId!,
-      userId: user._id,
-    })
+    try {
+      setIsDeleting(true)
+      setMedia((prev) => prev.filter((m) => m._id !== mediaId))
+      const result = await deleteMedia({
+        mediaId: mediaId!,
+        userId: user._id,
+      })
 
-    if (!result.success) {
-      toast.error("Failed to delete media")
+      if (!result.success) {
+        toast.error("Failed to delete media")
+        setMedia((prev) => [...prev, deletedMedia])
+        return
+      }
+
+      toast.success("Media deleted")
+    } catch (error) {
+      console.log(error)
       setMedia((prev) => [...prev, deletedMedia])
-      return
+    } finally {
+      setIsDeleting(false)
+      setIsDeleteOpen(false)
     }
+  }
 
-    toast.success("Media deleted")
+  const onConfirm = (mediaId: string, isOpen: boolean) => {
+    setIsDeleteOpen(isOpen)
+    setMediaId(mediaId)
   }
 
   const handleUnsave = async (mediaId: string) => {
@@ -204,7 +219,7 @@ export default function ProfilePage() {
         <div>
           {activeTab === "created" ? (
             <MediaContainer
-              onDelete={handleDeleteMedia}
+              onDelete={onConfirm}
               media={media}
               isLoading={createdLoading}
             />
@@ -217,6 +232,17 @@ export default function ProfilePage() {
           )}
         </div>
       </div>
+      <ConfirmDeleteModal
+        isOpen={isDeleteOpen}
+        onCancel={() => {
+          setIsDeleteOpen(false)
+          setMediaId("")
+        }}
+        onConfirm={handleDeleteMedia}
+        isLoading={isDeleting}
+        title="Delete Pin?"
+        description="This pin will be permanently removed."
+      />
     </div>
   )
 }

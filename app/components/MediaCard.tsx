@@ -15,12 +15,13 @@ export default function MediaCard({
   onUnsave,
 }: {
   item: IMediaClient
-  onDelete?: (mediaId: string) => void
+  onDelete?: (mediaId: string, isOpen: boolean) => void
   onUnsave?: (mediaId: string) => void
 }) {
   const [isSaved, setIsSaved] = useState(false)
   const [isCreator, setIsCreator] = useState(false)
   const [hasInteractedWithSave, setHasInteractedWithSave] = useState(false)
+  const [isOpen, setIsOpen] = useState(false)
 
   const { user } = useUserStore()
 
@@ -123,7 +124,10 @@ export default function MediaCard({
             </button>
             {isProfilePage && isCreator && onDelete && (
               <button
-                onClick={() => onDelete(item._id!)}
+                onClick={() => {
+                  setIsOpen(true)
+                  onDelete(item._id!, isOpen)
+                }}
                 className="p-2 rounded-xl ml-2 text-red-600 bg-white z-20 hover:bg-red-600 hover:text-white transition cursor-pointer"
               >
                 <Trash2 className="size-5" />
