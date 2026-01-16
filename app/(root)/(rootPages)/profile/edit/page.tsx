@@ -90,7 +90,7 @@ export default function EditProfile() {
   )
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen">
       {/* Header */}
       <header className="bg-white border-b border-gray-200 sticky top-0 z-10 shadow-sm">
         <div className="max-w-4xl mx-auto px-4 py-4 flex items-center justify-between">
@@ -124,7 +124,7 @@ export default function EditProfile() {
 
         {/* Basic Information */}
         <form action={formAction}>
-          <div className="bg-white rounded-3xl shadow-sm border border-gray-200 p-8 mb-6">
+          <div className="bg-white rounded-3xl shadow-sm border border-gray-200 p-4 lg:p-8 mb-6">
             <h2 className="text-lg font-semibold text-gray-900 mb-6">
               Basic information
             </h2>

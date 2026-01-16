@@ -1,4 +1,6 @@
+import { removeProfileImage } from "@/actions/removeProfileImage"
 import { updateUserProfileImage } from "@/actions/userActions"
+import ConfirmDeleteModal from "@/app/components/ConfirmtDeleteModal"
 import { useFileUpload } from "@/hooks/useFileUpload"
 import { useUserStore } from "@/store/useUserStore"
 import { IUserClient } from "@/types/interfaces"
@@ -20,6 +22,8 @@ const ProfilePhotoSection: React.FC<Props> = ({
   const [previewUrl, setPreviewUrl] = useState("")
   const [isSelectedImageChanged, setIsSelectedImageChanged] = useState(false)
   const [loading, setLoading] = useState(false)
+  const [isOpenRemove, setIsOpenRemove] = useState(false)
+  const [isDeleteLoading, setIsDeleteLoading] = useState(false)
 
   const { progress, uploadFile } = useFileUpload()
   const { user, setUser } = useUserStore()
@@ -83,14 +87,40 @@ const ProfilePhotoSection: React.FC<Props> = ({
       setPreviewUrl("")
     }
   }
+
+  const handleRemoveDp = async () => {
+    const profileImage = user?.profileImage
+    if (!user) return
+    try {
+      setIsDeleteLoading(true)
+      setUser({ ...user, profileImage: { imageUrl: "", identifier: "" } })
+
+      const result = await removeProfileImage(
+        user._id,
+        profileImage?.identifier!
+      )
+      if (!result || result.success) {
+        // setUser({ ...user, profileImage: profileImage })
+        toast.error("Failed to remove profile image")
+      }
+    } catch (error) {
+      console.log(error)
+      setUser({ ...user, profileImage: profileImage })
+      toast.error("Failed to remove profile image")
+    } finally {
+      setIsOpenRemove(false)
+      setIsDeleteLoading(false)
+      setUser({ ...user, profileImage: profileImage })
+    }
+  }
   return (
     <div>
-      <div className="bg-white rounded-3xl shadow-sm border border-gray-200 p-8 mb-6">
+      <div className="bg-white rounded-3xl shadow-sm border border-gray-200 p-4 md:p-8 mb-6">
         <h2 className="text-lg font-semibold text-gray-900 mb-6">
           Profile photo
         </h2>
 
-        <div className="flex items-start space-x-6">
+        <div className="flex flex-col md:flex-row items-center md:items-start space-x-6">
           <div className="relative">
             <div className="w-32 h-32 rounded-full overflow-hidden relative">
               {!profileImage && !previewUrl && firstname && lastname ? (
@@ -132,8 +162,8 @@ const ProfilePhotoSection: React.FC<Props> = ({
             </label>
           </div>
 
-          <div className="flex-1 pt-2">
-            <p className="text-gray-700 mb-4">
+          <div className="flex-1 mt-4 md:mt-0 pt-2">
+            <p className="text-gray-700 mb-4 text-center">
               Use a photo that clearly shows your face. You can also upload a
               logo or brand image.
             </p>
@@ -155,13 +185,29 @@ const ProfilePhotoSection: React.FC<Props> = ({
               >
                 {loading ? "Uploading..." : "Upload photo"}
               </button>
-              <button className="px-5 cursor-pointer py-2.5 text-gray-700 hover:bg-gray-100 font-medium rounded-full transition text-sm">
+              <button
+                disabled={user?.profileImage?.identifier ? false : true}
+                onClick={() => setIsOpenRemove(true)}
+                className={`px-5  py-2.5 text-gray-50 ${
+                  user?.profileImage?.identifier
+                    ? "bg-red-600 cursor-pointer"
+                    : "bg-gray-400 cursor-not-allowed"
+                }  font-medium rounded-full transition text-sm`}
+              >
                 Remove
               </button>
             </div>
           </div>
         </div>
       </div>
+      <ConfirmDeleteModal
+        isOpen={isOpenRemove}
+        onCancel={() => setIsOpenRemove(false)}
+        onConfirm={handleRemoveDp}
+        title="Remove Display Picture?"
+        description="This action cannot be undone."
+        isLoading={isDeleteLoading}
+      />
     </div>
   )
 }
