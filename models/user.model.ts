@@ -9,7 +9,7 @@ export interface IUser {
   lastname: string
   email: string
   about?: string
-  gender?: "male" | "female" | "other"
+  gender?: string
   password: string
   profileImage?: {
     imageUrl: string
@@ -51,7 +51,7 @@ const UserSchema: Schema<IUserDocument> = new Schema<IUserDocument>(
     },
     gender: {
       type: String,
-      enum: ["male", "female", "other"],
+      required: false,
     },
     profileImage: {
       type: {

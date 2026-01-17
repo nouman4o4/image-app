@@ -136,13 +136,17 @@ const ProfilePhotoSection: React.FC<Props> = ({
                   ) : (
                     ""
                   )}
-                  <Image
-                    className="w-full h-full object-cover"
-                    src={previewUrl || profileImage || ""}
-                    width={100}
-                    height={100}
-                    alt="Profile Image"
-                  />
+                  {previewUrl || profileImage ? (
+                    <Image
+                      className="w-full h-full object-cover"
+                      src={previewUrl || profileImage}
+                      width={100}
+                      height={100}
+                      alt="Profile Image"
+                    />
+                  ) : (
+                    ""
+                  )}
                 </>
               )}
             </div>

@@ -11,22 +11,19 @@ export async function removeProfileImage(userId: string, fileId: string) {
   try {
     await connectDB()
 
-    const user = await User.findByIdAndUpdate(
-      { _id: userId },
-      {
-        profileImage: null,
-      },
-      { new: true }
-    )
+    const user = await User.findById(userId)
     if (!user) throw new Error("User not found")
 
     // If no profile image, nothing to do
-    // if (!user.profileImage?.identifier) {
-    //   return { success: true }
-    // }
+    if (user.profileImage?.identifier) {
+      const deleteResponse = await deleteImageKitFile(
+        user.profileImage.identifier
+      )
+      if (!deleteResponse.success) {
+        throw new Error(deleteResponse.message)
+      }
+    }
     // 1️⃣ Delete from ImageKit
-
-    await deleteImageKitFile(fileId)
 
     // 2️⃣ Remove from DB
     user.profileImage = null
