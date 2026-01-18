@@ -99,14 +99,14 @@ export default function MediaComponent({
 
     if (user?._id && !hasInteracted) {
       const liked = mediaData?.likes?.some(
-        (id: any) => id.toString() === user?._id
+        (id: any) => id.toString() === user?._id,
       )
       setIsLiked(!!liked)
     }
 
     if (user?._id && !hasInteractedWithSave) {
       const isInitiallySaved = user?.savedMedia?.some(
-        (id: any) => id.toString() === mediaData._id
+        (id: any) => id.toString() === mediaData._id,
       )
       setIsSaved(!!isInitiallySaved)
     }
@@ -188,11 +188,7 @@ export default function MediaComponent({
                     }
                     className="p-2 hover:bg-gray-100 rounded-lg cursor-pointer"
                   >
-                    <ArrowDownToLine
-                      className={`${
-                        isLiked ? "fill-red-600 text-red-600" : ""
-                      }`}
-                    />
+                    <ArrowDownToLine />
                   </button>
                 </div>
               </div>
