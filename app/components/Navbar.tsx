@@ -16,7 +16,7 @@ export default function Navbar() {
   const [isFocused, setIsFocused] = useState(false)
 
   const { data: session } = useSession()
-  const { user, clearUser } = useUserStore()
+  const { user, clearUser, setUser } = useUserStore()
   const searchParams = useSearchParams()
   const pathname = usePathname()
   const dropDownMenuRef = useRef<HTMLDivElement>(null)
@@ -30,6 +30,13 @@ export default function Navbar() {
     e.preventDefault()
     if (!searchQuery.trim()) return
     router.push(`/search?q=${encodeURIComponent(searchQuery.trim())}`)
+  }
+
+  const handleLogout = () => {
+    setIsMenuOpen(false)
+    // clearUser()
+    setUser(null)
+    signOut()
   }
 
   useEffect(() => {
@@ -60,7 +67,7 @@ export default function Navbar() {
   return (
     <nav
       className={`fixed w-full top-0 left-0 right-0 ${
-        user ? "pl-[60px] lg:pl-20" : ""
+        user ? "pl-[60px] md:pl-20" : ""
       } z-50 bg-white shadow-sm border-b border-gray-200`}
     >
       <div className="w-full h-full p-4 flex gap-5 items-center">
@@ -116,7 +123,7 @@ export default function Navbar() {
                     height={50}
                   />
                 ) : (
-                  <div className="w-full h-full bg-gradient-to-br from-purple-400 via-pink-400 to-red-400 flex items-center justify-center text-white text-2xl font-bold shadow-lg">
+                  <div className="w-full h-full bg-gray-400 flex items-center justify-center text-white text-2xl font-bold shadow-lg">
                     {user?.firstname?.[0]}
                     {user?.lastname?.[0]}
                   </div>
@@ -170,7 +177,7 @@ export default function Navbar() {
                     alt="Profile"
                   />
                 ) : (
-                  <div className="size-14  rounded-full bg-gradient-to-br from-purple-400 via-pink-400 to-red-400 flex items-center justify-center text-white text-xl font-bold shadow-lg">
+                  <div className="size-14  rounded-full bg-gray-400 flex items-center justify-center text-white text-xl font-bold shadow-lg">
                     {user?.firstname?.[0]}
                     {user?.lastname?.[0]}
                   </div>
@@ -184,11 +191,7 @@ export default function Navbar() {
               </div>
             </Link>
             <button
-              onClick={() => {
-                setIsMenuOpen(false)
-                signOut()
-                clearUser()
-              }}
+              onClick={handleLogout}
               className="w-full py-2 font-medium rounded bg-gray-50 hover:bg-gray-100 shadow text-gray-700 cursor-pointer"
             >
               <LogOut className="inline size-5 mr-1" /> Log out

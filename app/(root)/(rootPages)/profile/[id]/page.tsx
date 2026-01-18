@@ -60,8 +60,8 @@ export default function ProfilePage() {
     }
   }
 
-  const onConfirm = (mediaId: string, isOpen: boolean) => {
-    setIsDeleteOpen(isOpen)
+  const onDelete = (mediaId: string) => {
+    setIsDeleteOpen(true)
     setMediaId(mediaId)
   }
 
@@ -219,7 +219,7 @@ export default function ProfilePage() {
         <div>
           {activeTab === "created" ? (
             <MediaContainer
-              onDelete={onConfirm}
+              onDelete={onDelete}
               media={media}
               isLoading={createdLoading}
             />

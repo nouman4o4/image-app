@@ -1,40 +1,42 @@
 import { withAuth } from "next-auth/middleware"
 import { NextResponse } from "next/server"
+import type { NextRequest } from "next/server"
 
 export default withAuth(
-  function middleware() {
+  function middleware(req: NextRequest) {
+    const token = (req as any).nextauth?.token
+    const { pathname, search } = req.nextUrl
+
+    // 🔐 If NOT authenticated and route is protected → redirect
+    if (!token && isProtectedRoute(pathname)) {
+      const loginUrl = req.nextUrl.clone()
+      loginUrl.pathname = "/login"
+      loginUrl.searchParams.set("redirect", pathname + search)
+      return NextResponse.redirect(loginUrl)
+    }
+
     return NextResponse.next()
   },
   {
     callbacks: {
-      authorized({ req, token }) {
-        const { pathname } = req.nextUrl
-        if (
-          pathname.startsWith("/api/auth") ||
-          pathname === "/login" ||
-          pathname === "/register"
-        )
-          return true
-
-        if (pathname === "/" || pathname.startsWith("/api/videos")) {
-          return true
-        }
-
-        return !!token
+      authorized: ({ token }) => {
+        return true
       },
     },
-  }
+  },
 )
+function isProtectedRoute(pathname: string) {
+  // Public routes
+  if (
+    pathname === "/" ||
+    pathname.startsWith("/pin") ||
+    pathname.startsWith("/api/pin") ||
+    pathname.startsWith("/login") ||
+    pathname.startsWith("/register") ||
+    pathname.startsWith("/api/auth")
+  ) {
+    return false
+  }
 
-export const config = {
-  matcher: [
-    /*
-     * Match all request paths except:
-     * - _next/static (static files)
-     * - _next/image (image optimization files)
-     * - favicon.ico (favicon file)
-     * - public folder
-     */
-    "/((?!_next/static|_next/image|favicon.ico|public/).*)",
-  ],
+  return true
 }

@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react"
 import toast from "react-hot-toast"
 import Link from "next/link"
-import { useRouter } from "next/navigation"
+import { useRouter, useSearchParams } from "next/navigation"
 import { FaGoogle } from "react-icons/fa"
 import { signIn, useSession } from "next-auth/react"
 import { getUserData } from "@/actions/userActions"
@@ -14,6 +14,7 @@ export default function Login() {
   const { data: session, status } = useSession()
   const router = useRouter()
   const { setUser, user } = useUserStore()
+  const searchParams = useSearchParams()
 
   const [errors, setErrors] = useState<{
     email?: string[]
@@ -26,42 +27,47 @@ export default function Login() {
     event.preventDefault()
     setErrors({})
     setIsPending(true)
+    const redirect = searchParams.get("redirect") || "/"
 
     const email = event.currentTarget.email.value
     const password = event.currentTarget.password.value
 
-    // Validate with Zod
-    const parsed = loginSchema.safeParse({ email, password })
-    if (!parsed.success) {
-      setErrors(parsed.error.flatten().fieldErrors)
-      setIsPending(false)
-      return
-    }
-
-    // NextAuth signIn
-    const result = await signIn("credentials", {
-      redirect: false,
-      email: parsed.data.email,
-      password: parsed.data.password,
-    })
-
-    if (result?.error) {
-      toast.error("Invalid email or password")
-      setIsPending(false)
-      return
-    }
-    if (session?.user._id) {
-      const userData = await getUserData(session?.user?._id)
-
-      if (userData) {
-        setUser(userData)
+    try {
+      // Validate with Zod
+      const parsed = loginSchema.safeParse({ email, password })
+      if (!parsed.success) {
+        setErrors(parsed.error.flatten().fieldErrors)
+        setIsPending(false)
+        return
       }
+
+      // NextAuth signIn
+      const result = await signIn("credentials", {
+        redirect: false,
+        email: parsed.data.email,
+        password: parsed.data.password,
+      })
+
+      if (result?.error) {
+        toast.error("Invalid email or password")
+        setIsPending(false)
+        return
+      }
+      if (session?.user._id) {
+        const userData = await getUserData(session?.user?._id)
+
+        if (userData) {
+          setUser(userData)
+        }
+      }
+
+      toast.success("Logged in successfully!")
+      router.replace(redirect)
+    } catch (error) {
+      console.log("error while loging in: ", error)
+    } finally {
+      setIsPending(false)
     }
-
-    toast.success("Logged in successfully!")
-    router.push("/")
-
-    setIsPending(false)
   }
 
   useEffect(() => {
@@ -71,7 +77,6 @@ export default function Login() {
     if (status === "authenticated" && session?.user?._id) {
       getUserData(session.user._id).then((userData) => {
         setUser(userData!)
-        console.log("setUser: ", userData)
       })
     }
   }, [status, session])

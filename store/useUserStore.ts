@@ -4,7 +4,7 @@ import { persist } from "zustand/middleware"
 
 interface UserState {
   user: IUserClient | null
-  setUser: (user: IUserClient) => void
+  setUser: (user: IUserClient | null) => void
   clearUser: () => void
 }
 
@@ -15,6 +15,6 @@ export const useUserStore = create<UserState>()(
       setUser: (user) => set({ user: user }),
       clearUser: () => set({ user: null }),
     }),
-    { name: "local_user" }
-  )
+    { name: "local_user" },
+  ),
 )

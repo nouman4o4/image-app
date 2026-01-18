@@ -8,6 +8,7 @@ import Link from "next/link"
 import React, { useEffect, useState } from "react"
 import { usePathname } from "next/navigation"
 import { useRouter } from "next/navigation"
+import toast from "react-hot-toast"
 
 export default function MediaCard({
   item,
@@ -15,7 +16,7 @@ export default function MediaCard({
   onUnsave,
 }: {
   item: IMediaClient
-  onDelete?: (mediaId: string, isOpen: boolean) => void
+  onDelete?: (mediaId: string) => void
   onUnsave?: (mediaId: string) => void
 }) {
   const [isSaved, setIsSaved] = useState(false)
@@ -44,13 +45,32 @@ export default function MediaCard({
     }
   }
 
+  const handleShare = async () => {
+    const url = `${window.location.origin}/pin/${item._id}`
+    if (navigator.share) {
+      try {
+        await navigator.share({
+          title: item.title,
+          text: "Checkout this pin",
+          url: url,
+        })
+      } catch (err) {
+        // user cancelled — ignore
+      }
+    } else {
+      // fallback
+      await navigator.clipboard.writeText(url)
+      toast.success("Link copied to clipboard")
+    }
+  }
+
   useEffect(() => {
     if (user?._id) {
       setIsCreator(item.uploadedBy.toString() === user?._id.toString())
     }
     if (user?._id && !hasInteractedWithSave) {
       const isInitiallySaved = user?.savedMedia?.some(
-        (id: any) => id.toString() === item._id
+        (id: any) => id.toString() === item._id,
       )
       setIsSaved(!!isInitiallySaved)
     }
@@ -61,7 +81,7 @@ export default function MediaCard({
       key={item._id}
       className="break-inside-avoid relative overflow-hidden rounded-2xl bg-white shadow-md hover:shadow-xl transition-shadow duration-300 group"
     >
-      <Link href={`/media/${item._id}`} className="z-20">
+      <Link href={`/pin/${item._id}`} className="z-20">
         {item.fileType === "image" ? (
           <Image
             src={item.mediaUrl}
@@ -119,14 +139,16 @@ export default function MediaCard({
             )}
           </div>
           <div className="w-full flex items-center justify-end pointer-events-auto">
-            <button className={`p-2 rounded-xl bg-white cursor-pointer `}>
+            <button
+              onClick={handleShare}
+              className={`p-2 rounded-xl bg-white cursor-pointer `}
+            >
               <Upload className="size-5" />
             </button>
             {isProfilePage && isCreator && onDelete && (
               <button
                 onClick={() => {
-                  setIsOpen(true)
-                  onDelete(item._id!, isOpen)
+                  onDelete(item._id!)
                 }}
                 className="p-2 rounded-xl ml-2 text-red-600 bg-white z-20 hover:bg-red-600 hover:text-white transition cursor-pointer"
               >

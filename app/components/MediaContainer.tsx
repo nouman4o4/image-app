@@ -9,7 +9,7 @@ import MediaSkeleton from "./MediaSkeleton"
 interface IMediaContainer {
   media: IMediaClient[]
   isLoading: boolean
-  onDelete?: (mediaId: string, isOpen: boolean) => void
+  onDelete?: (mediaId: string) => void
   onUnsave?: (mediaId: string) => void
 }
 
