@@ -15,7 +15,7 @@ export default function Home() {
         setLoading(true)
         const response: any = await apiClient.getMedia()
         if (!response.ok) {
-          console.log("error happened")
+          return
         }
         if (response.status! === "500") {
           console.error("Could not fetch the media due to server error.")
