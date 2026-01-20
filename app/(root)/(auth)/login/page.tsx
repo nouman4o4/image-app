@@ -70,6 +70,18 @@ export default function Login() {
     }
   }
 
+  const handleSigninWithGoogle = () => {
+    try {
+      setIsPending(true)
+      signIn("google", { callbackUrl: "/" })
+    } catch (error) {
+      toast.error("Failed to login with google")
+      console.log("google login failed: ", error)
+    } finally {
+      setIsPending(false)
+    }
+  }
+
   useEffect(() => {
     if (user) {
       return
@@ -95,7 +107,7 @@ export default function Login() {
         <div className="space-y-3 mb-6">
           <button
             type="button"
-            onClick={() => toast.success("Google login coming soon!")}
+            onClick={handleSigninWithGoogle}
             className="w-full p-2 border rounded-lg flex items-center justify-center gap-2 text-gray-700 hover:bg-gray-100 transition"
           >
             <FaGoogle className="w-6 h-6 text-[#DB4437]" />

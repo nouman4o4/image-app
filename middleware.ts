@@ -33,7 +33,8 @@ function isProtectedRoute(pathname: string) {
     pathname.startsWith("/api/pin") ||
     pathname.startsWith("/login") ||
     pathname.startsWith("/register") ||
-    pathname.startsWith("/api/auth")
+    pathname.startsWith("/api/auth") ||
+    pathname.startsWith("/api/media")
   ) {
     return false
   }
