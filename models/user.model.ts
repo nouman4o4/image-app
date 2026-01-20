@@ -6,11 +6,10 @@ import bcrypt from "bcryptjs"
 // ---------------------
 export interface IUser {
   firstname: string
-  lastname: string
+  lastname?: string
   email: string
   about?: string
   gender?: string
-  password: string
   profileImage?: {
     imageUrl: string
     identifier: string
@@ -20,15 +19,18 @@ export interface IUser {
   followers?: Types.ObjectId[]
   savedMedia?: Types.ObjectId[]
   likedMedia?: Types.ObjectId[]
+  provider: "credentials" | "google"
+  password?: string
 
   comparePassword(candidatePassword: string): Promise<boolean>
 }
+
 export type IUserDocument = IUser & Document
 
 // ---------------------
 // Schema
 // ---------------------
-const UserSchema: Schema<IUserDocument> = new Schema<IUserDocument>(
+const UserSchema: Schema<IUserDocument> = new Schema(
   {
     firstname: {
       type: String,
@@ -37,7 +39,7 @@ const UserSchema: Schema<IUserDocument> = new Schema<IUserDocument>(
     },
     lastname: {
       type: String,
-      required: true,
+      required: false,
       trim: true,
     },
     email: {
@@ -45,13 +47,13 @@ const UserSchema: Schema<IUserDocument> = new Schema<IUserDocument>(
       required: true,
       unique: true,
       lowercase: true,
+      index: true,
     },
     about: {
       type: String,
     },
     gender: {
       type: String,
-      required: false,
     },
     profileImage: {
       type: {
@@ -60,28 +62,54 @@ const UserSchema: Schema<IUserDocument> = new Schema<IUserDocument>(
       },
       default: null,
     },
+
+    // 🔹 Auth fields
+    provider: {
+      type: String,
+      enum: ["credentials", "google"],
+      default: "credentials",
+      required: true,
+    },
+
+    password: {
+      type: String,
+      required: function (this: IUserDocument) {
+        return this.provider === "credentials"
+      },
+      select: false, // 🔥 VERY IMPORTANT: password not returned by default
+    },
+
     media: [{ type: Schema.Types.ObjectId, ref: "Media" }],
     followers: [{ type: Schema.Types.ObjectId, ref: "User" }],
     savedMedia: [{ type: Schema.Types.ObjectId, ref: "Media" }],
     likedMedia: [{ type: Schema.Types.ObjectId, ref: "Media" }],
-    password: { type: String, required: true, minlength: 6 },
     totalLikes: { type: Number, default: 0 },
   },
-  { timestamps: true }
+  { timestamps: true },
 )
 
 // ---------------------
-// Middleware: Hash password before save, But will not work for findOneByIdAndUpdate();
+// Middleware: Hash password before save
 // ---------------------
 UserSchema.pre("save", async function (next) {
-  if (!this.isModified("password")) return next()
+  // Only hash if:
+  // - provider is credentials
+  // - password exists
+  // - password was modified
+  if (
+    this.provider !== "credentials" ||
+    !this.password ||
+    !this.isModified("password")
+  ) {
+    return next()
+  }
 
   try {
     const salt = await bcrypt.genSalt(10)
     this.password = await bcrypt.hash(this.password, salt)
     return next()
-  } catch (err: any) {
-    return next(err)
+  } catch (err) {
+    return next(err as any)
   }
 })
 
@@ -89,8 +117,13 @@ UserSchema.pre("save", async function (next) {
 // Methods
 // ---------------------
 UserSchema.methods.comparePassword = async function (
-  candidatePassword: string
+  candidatePassword: string,
 ): Promise<boolean> {
+  // 🔥 Protect against OAuth users
+  if (this.provider !== "credentials" || !this.password) {
+    throw new Error("Password login not allowed for this account")
+  }
+
   return bcrypt.compare(candidatePassword, this.password)
 }
 

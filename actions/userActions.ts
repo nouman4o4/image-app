@@ -15,7 +15,7 @@ export const getUserData = async (id: string) => {
       return
     }
     await connectDB()
-    const user = await User.findById(id).select("-password").lean()
+    const user = await User.findById(id).lean()
     if (!user) {
       console.log("User not found with given id")
       return
@@ -42,7 +42,7 @@ export const updateUser = async (userId: string, userData: any) => {
         gender: userData.gender,
         about: userData.about,
       },
-      { new: true }
+      { new: true },
     )
       .select("-password")
       .lean<IUserClient>()
@@ -100,7 +100,7 @@ export const getSavedMedia = async (userId: string) => {
 
 export const updateUserProfileImage = async (
   ImageData: { imageUrl: string; identifier: string },
-  userId: string
+  userId: string,
 ) => {
   try {
     if (!ImageData.imageUrl || !ImageData.identifier || !userId) {
@@ -115,7 +115,7 @@ export const updateUserProfileImage = async (
 
     if (user.profileImage?.identifier) {
       const deleteResponse = await deleteImageKitFile(
-        user.profileImage.identifier
+        user.profileImage.identifier,
       )
       if (!deleteResponse.success) {
         throw new Error(deleteResponse.message)
@@ -131,7 +131,7 @@ export const updateUserProfileImage = async (
           },
         },
       },
-      { new: true }
+      { new: true },
     )
       .select("-password")
       .lean<IUserClient>()

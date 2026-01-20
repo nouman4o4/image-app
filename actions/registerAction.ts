@@ -14,7 +14,7 @@ export type FormState = {
 
 export const submitRegister = async (
   pevState: FormState,
-  form_data: FormData
+  form_data: FormData,
 ) => {
   const data = {
     firstname: form_data.get("firstname") as string,
@@ -41,7 +41,7 @@ export const submitRegister = async (
       },
       method: "POST",
       credentials: "include",
-      body: JSON.stringify(parsed.data),
+      body: JSON.stringify({ ...parsed.data, provider: "credentials" }),
     })
 
     if (!response.ok) {

@@ -8,7 +8,8 @@ export const registerSchema = z.object({
   lastname: z
     .string()
     .min(3, "Last name must be at least 3 characters.")
-    .max(10, "Last name shoud be less than 10 chars."),
+    .max(10, "Last name shoud be less than 10 chars.")
+    .optional(),
   email: z
     .string({ error: "Email is required" })
     .email("Invalid email adress."),
