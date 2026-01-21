@@ -70,7 +70,7 @@ export default function Navbar() {
         user ? "pl-[60px] md:pl-20" : ""
       } z-50 bg-white shadow-sm border-b border-gray-200`}
     >
-      <div className="w-full h-full p-4 flex gap-5 items-center">
+      <div className="w-full h-full p-4 flex justify-between gap-5 items-center">
         {!user ? (
           <div>
             <FullLogo />
@@ -81,7 +81,7 @@ export default function Navbar() {
         {/* Serach */}
         <form
           onSubmit={handleSearchSubmit}
-          className="group grow h-full focus-within:ring-2 ring-blue-300 bg-gray-200 relative pl-5 py-3 rounded-xl overflow-hidden"
+          className={`group grow h-full focus-within:ring-2 ring-blue-300 bg-gray-200 relative pl-5 py-3 rounded-xl overflow-hidden ${user ? "block" : "hidden"}`}
         >
           <Search className="absolute left-3 size-5 top-1/2 -translate-y-1/2 text-gray-700" />
           <input
@@ -138,14 +138,14 @@ export default function Navbar() {
               </button>
             </div>
           ) : (
-            <div className="flex items-center gap-2">
+            <div className="flex items-center gap-2 text-sm md:text-lg">
               <Link href={"/login"}>
-                <button className="p-3 px-4 rounded-2xl shadow-xl font-medium cursor-pointer bg-gray-200">
+                <button className="p-3 sm:px-4 rounded-xl sm:rounded-2xl shadow-lg font-medium cursor-pointer bg-gray-200">
                   Log in
                 </button>
               </Link>
               <Link href={"/register"}>
-                <button className="p-3 px-4 rounded-2xl shadow-xl  bg-red-600 text-white font-medium cursor-pointer">
+                <button className="p-3 sm:px-4 rounded-xl sm:rounded-2xl shadow-lg bg-red-600 text-white font-medium cursor-pointer">
                   Sign up
                 </button>
               </Link>

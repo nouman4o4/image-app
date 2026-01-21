@@ -7,8 +7,11 @@ import { useRouter } from "next/navigation"
 import { Eye, EyeOff } from "lucide-react"
 import Link from "next/link"
 import { FaGoogle, FaLinkedin, FaGithub } from "react-icons/fa"
+import Image from "next/image"
+import { signIn } from "next-auth/react"
 export default function Register() {
   const [passwordVisible, setPasswordVisible] = useState(false)
+  const [isPending, setIsPending] = useState(false)
   const router = useRouter()
   const [state, formAction, ispending] = useActionState<FormState, FormData>(
     submitRegister,
@@ -20,8 +23,20 @@ export default function Register() {
       errors: undefined,
       success: undefined,
       message: "",
-    }
+    },
   )
+
+  const handleSigninWithGoogle = () => {
+    try {
+      setIsPending(true)
+      signIn("google", { callbackUrl: "/" })
+    } catch (error) {
+      toast.error("Failed to login with google")
+      console.log("google login failed: ", error)
+    } finally {
+      setIsPending(false)
+    }
+  }
 
   useEffect(() => {
     if (state?.success) {
@@ -33,53 +48,14 @@ export default function Register() {
   }, [state, router])
 
   return (
-    <div className="md:min-h-screen pt-6 md:pt-0 md:py-10  flex items-center justify-center md:p-4">
+    <div className="md:min-h-screen py-6 md:pt-0 md:py-10 flex items-center justify-center p-2 md:p-4">
       <div className="w-full max-w-md">
-        <div className="bg-white md:rounded-2xl shadow-lg p-3 md:p-8 border border-gray-200">
+        <div className="bg-white rounded-xl md:rounded-2xl shadow-lg p-3 md:p-8 border border-gray-200">
           <div className="text-center mb-8">
             <h1 className="text-3xl md:text-4xl font-bold text-gray-900 mb-2">
               Join us
             </h1>
             <p className="text-gray-500">Find new ideas to try</p>
-          </div>
-
-          <div className="flex items-center justify-center gap-4 mb-6">
-            {/* Google */}
-            <button
-              onClick={() => toast.success("Google login coming soon!")}
-              className="flex flex-col items-center justify-center w-20 h-20 border border-gray-200 rounded-xl hover:bg-gray-100 transition"
-            >
-              <FaGoogle className="w-6 h-6 mb-2 text-[#DB4437]" />
-              <span className="text-xs font-medium text-gray-700">Google</span>
-            </button>
-
-            {/* LinkedIn */}
-            <button
-              onClick={() => toast.success("LinkedIn login coming soon!")}
-              className="flex flex-col items-center justify-center w-20 h-20 border border-gray-200 rounded-xl hover:bg-gray-100 transition"
-            >
-              <FaLinkedin className="w-6 h-6 mb-2 text-[#0A66C2]" />
-              <span className="text-xs font-medium text-gray-700">
-                LinkedIn
-              </span>
-            </button>
-
-            {/* GitHub */}
-            <button
-              onClick={() => toast.success("GitHub login coming soon!")}
-              className="flex flex-col items-center justify-center w-20 h-20 border border-gray-200 rounded-xl hover:bg-gray-100 transition"
-            >
-              <FaGithub className="w-6 h-6 mb-2 text-gray-800" />
-              <span className="text-xs font-medium text-gray-700">GitHub</span>
-            </button>
-          </div>
-
-          {/* Divider */}
-          <div className="relative mb-6">
-            <div className="h-px bg-gray-200" />
-            <span className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 bg-white px-3 text-xs text-gray-500 font-medium">
-              OR
-            </span>
           </div>
 
           {/* Signup form */}
@@ -141,7 +117,7 @@ export default function Register() {
                 id="email"
                 name="email"
                 type="email"
-                placeholder="john.doe@example.com"
+                placeholder="Email"
                 className="h-11 px-3 w-full border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:outline-none"
               />
               {state?.errors?.email && (
@@ -185,19 +161,51 @@ export default function Register() {
               type="submit"
               className="w-full h-11 text-sm font-semibold bg-red-600 text-white rounded-lg shadow-md hover:opacity-90 transition cursor-pointer"
             >
-              {ispending ? "Creating account..." : "Continue"}
+              {ispending || isPending ? "Creating account..." : "Submit"}
             </button>
           </form>
 
-          <p className="text-center text-sm text-gray-500 mt-6">
+          <div className="relative my-6">
+            <div className="h-px bg-gray-200" />
+            <span className="absolute left-1/2 -translate-x-1/2 -translate-y-1/2 bg-white px-3 text-xs text-gray-400">
+              OR
+            </span>
+          </div>
+          <p className="text-center text-sm text-gray-500 mt-2">
             Already have an account?{" "}
-            <Link
-              href="/login"
-              className="text-indigo-600 font-semibold hover:underline"
-            >
-              Log in
-            </Link>
           </p>
+          <div className="space-y-3 my-4 mb-6">
+            <button
+              type="button"
+              className="w-full p-2 bg-gray-100 rounded-lg flex items-center justify-center gap-2 text-gray-700 hover:bg-gray-100 transition"
+            >
+              <Link
+                href="/login"
+                className="text-blue-600 font-semibold hover:underline"
+              >
+                Log in
+              </Link>
+            </button>
+            <button
+              type="button"
+              onClick={handleSigninWithGoogle}
+              className="w-full p-2 bg-gray-100 rounded-lg flex cursor-pointer items-center justify-center gap-2 text-gray-700 hover:bg-gray-100 transition"
+            >
+              <Image
+                src="google.svg"
+                alt="google"
+                className="w-6"
+                width={30}
+                height={30}
+              />
+              <span>
+                <span className="hidden font-medium md:inline">
+                  Continue with
+                </span>{" "}
+                Google
+              </span>
+            </button>
+          </div>
         </div>
       </div>
     </div>

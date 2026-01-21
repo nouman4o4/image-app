@@ -9,6 +9,7 @@ import { signIn, useSession } from "next-auth/react"
 import { getUserData } from "@/actions/userActions"
 import { useUserStore } from "@/store/useUserStore"
 import { loginSchema } from "@/schemas/login.shcema"
+import Image from "next/image"
 
 export default function Login() {
   const { data: session, status } = useSession()
@@ -94,35 +95,13 @@ export default function Login() {
   }, [status, session])
 
   return (
-    <main className="pt-6 md:pt-0 md:py-10 min-h-screen flex justify-center md:px-4">
-      <div className="w-full max-w-md bg-white shadow-lg md:rounded-2xl p-3 md:p-8 border border-gray-200">
+    <main className="py-6 md:pt-0 md:py-10 flex justify-center px-2 md:px-4 ">
+      <div className="w-full max-w-md bg-white shadow-lg rounded-2xl p-4 md:p-8 border border-gray-200">
         <div className="text-center mb-8">
           <h1 className="text-2xl md:text-3xl font-bold text-gray-800 mb-2">
             Welcome back
           </h1>
           <p className="text-gray-500">Sign in to continue</p>
-        </div>
-
-        {/* Social buttons */}
-        <div className="space-y-3 mb-6">
-          <button
-            type="button"
-            onClick={handleSigninWithGoogle}
-            className="w-full p-2 border rounded-lg flex items-center justify-center gap-2 text-gray-700 hover:bg-gray-100 transition"
-          >
-            <FaGoogle className="w-6 h-6 text-[#DB4437]" />
-            <span>
-              <span className="hidden md:inline">Continue with</span> Google
-            </span>
-          </button>
-        </div>
-
-        {/* OR Separator */}
-        <div className="relative mb-6">
-          <div className="h-px bg-gray-200" />
-          <span className="absolute left-1/2 -translate-x-1/2 -translate-y-1/2 bg-white px-3 text-xs text-gray-400">
-            OR
-          </span>
         </div>
 
         {/* Login Form */}
@@ -139,9 +118,9 @@ export default function Login() {
               id="email"
               name="email"
               type="email"
-              placeholder="john.doe@example.com"
+              placeholder="Email"
               disabled={isPending}
-              className="mt-1 w-full h-11 border border-gray-300 rounded-lg px-3 text-gray-800 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="mt-1 w-full h-11 border border-gray-300 rounded-xl px-3 text-gray-800 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500"
             />
             {errors.email && (
               <p className="text-red-500 text-xs mt-1">{errors.email}</p>
@@ -160,9 +139,9 @@ export default function Login() {
               id="password"
               name="password"
               type="password"
-              placeholder="Enter your password"
+              placeholder="Password"
               disabled={isPending}
-              className="mt-1 w-full h-11 border border-gray-300 rounded-lg px-3 text-gray-800 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="mt-1 w-full h-11 border border-gray-300 rounded-xl px-3 text-gray-800 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500"
             />
             {errors.password && (
               <p className="text-red-500 text-xs mt-1">{errors.password}</p>
@@ -180,24 +159,54 @@ export default function Login() {
           <button
             type="submit"
             disabled={isPending}
-            className={`w-full h-11 text-sm font-semibold bg-red-600 text-white rounded-lg shadow-md hover:opacity-90 transition ${
+            className={`w-full h-11 cursor-pointer text-sm font-semibold bg-red-600 text-white rounded-lg shadow-md hover:opacity-90 transition ${
               isPending ? "cursor-not-allowed" : ""
             }`}
           >
             {isPending ? "Signing in..." : "Sign in"}
           </button>
         </form>
-
-        {/* Footer */}
-        <p className="text-center text-sm text-gray-500 mt-6">
+        <div className="relative my-6">
+          <div className="h-px bg-gray-200" />
+          <span className="absolute left-1/2 -translate-x-1/2 -translate-y-1/2 bg-white px-3 text-xs text-gray-400">
+            OR
+          </span>
+        </div>
+        <p className="text-center text-sm text-gray-500 mt-2">
           Not on our platform yet?{" "}
-          <Link
-            href="/register"
-            className="text-blue-600 font-semibold hover:underline"
-          >
-            Sign up
-          </Link>
         </p>
+        <div className="space-y-3 my-4 mb-6">
+          <button
+            type="button"
+            className="w-full p-2 bg-gray-100 rounded-lg flex items-center justify-center gap-2 text-gray-700 hover:bg-gray-100 transition"
+          >
+            <Link
+              href="/register"
+              className="text-blue-600 font-semibold hover:underline"
+            >
+              Create an account
+            </Link>
+          </button>
+          <button
+            type="button"
+            onClick={handleSigninWithGoogle}
+            className="w-full p-2 bg-gray-100 rounded-lg flex cursor-pointer items-center justify-center gap-2 text-gray-700 hover:bg-gray-100 transition"
+          >
+            <Image
+              src="google.svg"
+              alt="google"
+              className="w-6"
+              width={30}
+              height={30}
+            />
+            <span>
+              <span className="hidden font-medium md:inline">
+                Continue with
+              </span>{" "}
+              Google
+            </span>
+          </button>
+        </div>
       </div>
     </main>
   )
