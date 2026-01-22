@@ -9,6 +9,7 @@ import Link from "next/link"
 import { FaGoogle, FaLinkedin, FaGithub } from "react-icons/fa"
 import Image from "next/image"
 import { signIn } from "next-auth/react"
+import { FcGoogle } from "react-icons/fc"
 export default function Register() {
   const [passwordVisible, setPasswordVisible] = useState(false)
   const [isPending, setIsPending] = useState(false)
@@ -191,19 +192,17 @@ export default function Register() {
               onClick={handleSigninWithGoogle}
               className="w-full p-2 bg-gray-100 rounded-lg flex cursor-pointer items-center justify-center gap-2 text-gray-700 hover:bg-gray-100 transition"
             >
-              <Image
-                src="google.svg"
-                alt="google"
-                className="w-6"
-                width={30}
-                height={30}
-              />
-              <span>
-                <span className="hidden font-medium md:inline">
-                  Continue with
-                </span>{" "}
-                Google
-              </span>
+              <FcGoogle className="size-6" />
+              {isPending ? (
+                <p>Loading...</p>
+              ) : (
+                <span>
+                  <span className="hidden font-medium md:inline">
+                    Continue with
+                  </span>{" "}
+                  Google
+                </span>
+              )}
             </button>
           </div>
         </div>

@@ -10,6 +10,7 @@ import { getUserData } from "@/actions/userActions"
 import { useUserStore } from "@/store/useUserStore"
 import { loginSchema } from "@/schemas/login.shcema"
 import Image from "next/image"
+import { FcGoogle } from "react-icons/fc"
 
 export default function Login() {
   const { data: session, status } = useSession()
@@ -192,19 +193,17 @@ export default function Login() {
             onClick={handleSigninWithGoogle}
             className="w-full p-2 bg-gray-100 rounded-lg flex cursor-pointer items-center justify-center gap-2 text-gray-700 hover:bg-gray-100 transition"
           >
-            <Image
-              src="google.svg"
-              alt="google"
-              className="w-6"
-              width={30}
-              height={30}
-            />
-            <span>
-              <span className="hidden font-medium md:inline">
-                Continue with
-              </span>{" "}
-              Google
-            </span>
+            <FcGoogle className="size-6" />
+            {isPending ? (
+              <p>Loading...</p>
+            ) : (
+              <span>
+                <span className="hidden font-medium md:inline">
+                  Continue with
+                </span>{" "}
+                Google
+              </span>
+            )}
           </button>
         </div>
       </div>
