@@ -21,8 +21,8 @@ import { getUserData } from "@/actions/userActions"
 import { useSession } from "next-auth/react"
 import { toggleLike } from "@/actions/toggleLike"
 import { toggleSave } from "@/actions/toggleSave"
-import { HiDocumentDownload, HiOutlineDocumentDownload } from "react-icons/hi"
 import toast from "react-hot-toast"
+import { useRouter } from "next/navigation"
 
 export default function MediaComponent({
   mediaData,
@@ -39,9 +39,15 @@ export default function MediaComponent({
   const [isCreator, setIsCreator] = useState(false)
   const { data: session, status } = useSession()
 
+  const router = useRouter()
+
   const userAuthenticated = status === "authenticated" && user !== null
 
   const handleLike = async () => {
+    if (!userAuthenticated) {
+      toast.error("Please login first")
+      return
+    }
     setHasInteracted(true)
     setIsLiked((prev) => !prev)
     setLikes((prev) => (isLiked ? prev - 1 : prev + 1))
@@ -49,6 +55,10 @@ export default function MediaComponent({
   }
 
   const handleSave = async () => {
+    if (!userAuthenticated) {
+      toast.error("Please login first")
+      return
+    }
     setHasInteractedWithSave(true)
     setIsSaved((prev) => !prev)
 
@@ -65,6 +75,10 @@ export default function MediaComponent({
   }
 
   const handleDownload = async (url: string, filename: string) => {
+    if (!userAuthenticated) {
+      toast.error("Please login first")
+      return
+    }
     try {
       const response = await fetch(url)
       const blob = await response.blob()
@@ -92,6 +106,10 @@ export default function MediaComponent({
       setCreator(data)
     }
     getCreator()
+
+    if (!userAuthenticated) {
+      return
+    }
 
     if (user?._id) {
       setIsCreator(mediaData.uploadedBy.toString() === user?._id.toString())

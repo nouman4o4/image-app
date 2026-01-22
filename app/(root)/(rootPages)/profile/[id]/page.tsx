@@ -16,6 +16,7 @@ import { deleteMedia } from "@/actions/deleteMedia"
 import toast from "react-hot-toast"
 import { unsaveMedia } from "@/actions/unsaveMedia"
 import ConfirmDeleteModal from "@/app/components/ConfirmtDeleteModal"
+import { useSession } from "next-auth/react"
 
 export default function ProfilePage() {
   const [activeTab, setActiveTab] = useState<"created" | "saved">("created")
@@ -27,6 +28,8 @@ export default function ProfilePage() {
   const [isDeleting, setIsDeleting] = useState(false)
   const [isDeleteOpen, setIsDeleteOpen] = useState(false)
   const [mediaId, setMediaId] = useState("")
+
+  const { data: session, status } = useSession()
 
   const params = useParams()
   const userId = Array.isArray(params.id) ? params.id[0] : params.id
@@ -97,12 +100,15 @@ export default function ProfilePage() {
 
   useEffect(() => {
     const fetchData = async () => {
-      if (!userId) return
+      if (status === "unauthenticated" || !session?.user._id) return
+
       const [userDetails, created] = await Promise.all([
-        getUserData(userId as string),
-        getCreatedMedia(userId as string),
+        getUserData(session.user._id),
+        getCreatedMedia(session.user._id),
       ])
+
       setUser(userDetails!)
+
       setUserData(userDetails)
       setMedia(created)
       setCreatedLoading(false)

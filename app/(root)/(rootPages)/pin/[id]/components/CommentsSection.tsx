@@ -5,6 +5,7 @@ import { getComments } from "@/actions/getComments"
 import { useUserStore } from "@/store/useUserStore"
 import { ChevronDown, Trash2 } from "lucide-react"
 import Image from "next/image"
+import { useRouter } from "next/navigation"
 import React, { useEffect, useState } from "react"
 import toast from "react-hot-toast"
 
@@ -29,7 +30,14 @@ export default function CommentsSection({ mediaId }: { mediaId: string }) {
   const { user } = useUserStore()
   const [isCommentsShown, setIsCommentsShown] = useState(false)
 
+  const router = useRouter()
+  const userAuthenticated = status === "authenticated" && user !== null
+
   const handleCreateComment = async () => {
+    if (!userAuthenticated) {
+      toast.error("Please login first")
+      return
+    }
     if (content.length === 0) {
       toast.error("Please add some content in the comment input.")
       return

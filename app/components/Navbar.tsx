@@ -15,7 +15,7 @@ export default function Navbar() {
   const [searchQuery, setSearchQuery] = useState("")
   const [isFocused, setIsFocused] = useState(false)
 
-  const { data: session } = useSession()
+  const { data: session, status } = useSession()
   const { user, clearUser, setUser } = useUserStore()
   const searchParams = useSearchParams()
   const pathname = usePathname()
@@ -34,9 +34,9 @@ export default function Navbar() {
 
   const handleLogout = () => {
     setIsMenuOpen(false)
-    // clearUser()
     setUser(null)
-    signOut()
+    signOut({ redirect: true, callbackUrl: "/login" })
+    clearUser()
   }
 
   useEffect(() => {
@@ -67,11 +67,13 @@ export default function Navbar() {
   return (
     <nav
       className={`fixed w-full top-0 left-0 right-0 ${
-        user ? "pl-[60px] md:pl-20" : ""
+        status === "authenticated" && session.user._id
+          ? "pl-[60px] md:pl-20"
+          : ""
       } z-50 bg-white shadow-sm border-b border-gray-200`}
     >
       <div className="w-full h-full p-4 flex justify-between gap-5 items-center">
-        {!user ? (
+        {!session?.user._id && status !== "authenticated" ? (
           <div>
             <FullLogo />
           </div>
@@ -79,39 +81,43 @@ export default function Navbar() {
           ""
         )}
         {/* Serach */}
-        <form
-          onSubmit={handleSearchSubmit}
-          className={`group grow h-full focus-within:ring-2 ring-blue-300 bg-gray-200 relative pl-5 py-3 rounded-xl overflow-hidden ${user ? "block" : "hidden"}`}
-        >
-          <Search className="absolute left-3 size-5 top-1/2 -translate-y-1/2 text-gray-700" />
-          <input
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.currentTarget.value)}
-            type="text"
-            onFocus={() => setIsFocused(true)}
-            onBlur={() => setIsFocused(false)}
-            id=""
-            className="w-full outline-none pl-5 text-gray-600 font-medium"
-            placeholder="Search"
-          />
-          <div className="absolute top-0 right-0 h-full flex items-center">
-            {searchQuery && isFocused ? (
-              <X
-                className="mr-2 size-7 cursor-pointer text-gray-700"
-                onMouseDown={(e) => e.preventDefault()}
-                onClick={() => setSearchQuery("")}
-              />
-            ) : (
-              ""
-            )}
-            {/* <div className="flex px-3 bg-black h-full text-white items-center justify-center cursor-pointer">
+        {status === "authenticated" && session.user._id ? (
+          <form
+            onSubmit={handleSearchSubmit}
+            className={`group grow h-full focus-within:ring-2 ring-blue-300 bg-gray-200 relative pl-5 py-3 rounded-xl overflow-hidden ${user ? "block" : "hidden"}`}
+          >
+            <Search className="absolute left-3 size-5 top-1/2 -translate-y-1/2 text-gray-700" />
+            <input
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.currentTarget.value)}
+              type="text"
+              onFocus={() => setIsFocused(true)}
+              onBlur={() => setIsFocused(false)}
+              id=""
+              className="w-full outline-none pl-5 text-gray-600 font-medium"
+              placeholder="Search"
+            />
+            <div className="absolute top-0 right-0 h-full flex items-center">
+              {searchQuery && isFocused ? (
+                <X
+                  className="mr-2 size-7 cursor-pointer text-gray-700"
+                  onMouseDown={(e) => e.preventDefault()}
+                  onClick={() => setSearchQuery("")}
+                />
+              ) : (
+                ""
+              )}
+              {/* <div className="flex px-3 bg-black h-full text-white items-center justify-center cursor-pointer">
               <Search />
             </div> */}
-          </div>
-        </form>
+            </div>
+          </form>
+        ) : (
+          ""
+        )}
         {/* Right User  */}
         <div>
-          {user ? (
+          {status === "authenticated" && session.user._id ? (
             <div className="flex items-center gap-2">
               <div className="size-12 rounded-full overflow-hidden">
                 {user?.profileImage?.imageUrl ? (

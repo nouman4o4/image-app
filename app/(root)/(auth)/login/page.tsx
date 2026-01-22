@@ -4,7 +4,7 @@ import { useEffect, useState } from "react"
 import toast from "react-hot-toast"
 import Link from "next/link"
 import { useRouter, useSearchParams } from "next/navigation"
-import { FaGoogle } from "react-icons/fa"
+
 import { signIn, useSession } from "next-auth/react"
 import { getUserData } from "@/actions/userActions"
 import { useUserStore } from "@/store/useUserStore"
