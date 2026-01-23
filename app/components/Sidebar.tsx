@@ -47,7 +47,7 @@ export default function Sidebar() {
     {
       id: "notifications",
       icon: <Bell />,
-      href: "#",
+      href: "/notifications",
       label: "Notifications",
     },
     {
@@ -77,8 +77,8 @@ export default function Sidebar() {
               activeItem === item.id && !item.isLogo
                 ? "bg-black text-white"
                 : !item.isLogo
-                ? "text-gray-700 hover:bg-gray-100"
-                : ""
+                  ? "text-gray-700 hover:bg-gray-100"
+                  : ""
             }
           `}
           title={item.label}
