@@ -1,22 +1,31 @@
+"use client"
 import { getMedia } from "@/app/actions/getMedia"
-import React from "react"
+import React, { useEffect, useState } from "react"
 import MediaComponent from "./components/MediaComponent"
 import RelatedMedia from "./components/RelatedMedia"
+import { IMediaClient } from "@/types/interfaces"
+import { useParams } from "next/navigation"
 
-export default async function page({
-  params,
-}: {
-  params: Promise<{ id: string }>
-}) {
-  const { id } = await params
-  let mediaData = null
-  let error = null
-  try {
-    mediaData = await getMedia(id)
-  } catch (error) {
-    console.error("Error fetching media: ", error)
-    error = "Something went wrong while loading this media."
-  }
+export default function page() {
+  const [mediaData, setMediaData] = useState<IMediaClient | undefined>()
+  const [error, setError] = useState<any>()
+  const params = useParams()
+  const id = params.id
+
+  // let mediaData = null
+  // let error = null
+  useEffect(() => {
+    ;(async () => {
+      try {
+        const result = await getMedia(id as string)
+        setMediaData(result)
+      } catch (error) {
+        console.error("Error fetching media: ", error)
+
+        setError(error || "Something went wrong while loading this media.")
+      }
+    })()
+  }, [id])
   if (error) {
     return (
       <div className="flex items-center justify-center h-[60vh]">

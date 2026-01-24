@@ -23,6 +23,7 @@ import { toggleLike } from "@/actions/toggleLike"
 import { toggleSave } from "@/actions/toggleSave"
 import toast from "react-hot-toast"
 import { useRouter } from "next/navigation"
+import Link from "next/link"
 
 export default function MediaComponent({
   mediaData,
@@ -238,8 +239,11 @@ export default function MediaComponent({
               </p>
             </div>
             <div>
-              <div className="flex items-center gap-3">
-                <div className="w-12 h-12 bg-gradient-to-br overflow-hidden bg-gray-400 rounded-full flex items-center justify-center text-white font-bold shadow-md">
+              <div className="flex border-1 items-center gap-3">
+                <Link
+                  className="w-12 h-12 bg-gradient-to-br overflow-hidden bg-gray-400 rounded-full flex items-center justify-center text-white font-bold shadow-md"
+                  href={`/profile/${creator?._id}`}
+                >
                   {creator?.profileImage ? (
                     <Image
                       className="w-full h-full object-cover"
@@ -251,11 +255,16 @@ export default function MediaComponent({
                   ) : (
                     creator?.firstname.charAt(0).toUpperCase()
                   )}
-                </div>
+                </Link>
                 <div>
-                  <p className="font-semibold text-gray-900">
-                    {creator?.firstname} {creator?.lastname}
-                  </p>
+                  <Link
+                    className="w-full h-full"
+                    href={`/profile/${creator?._id}`}
+                  >
+                    <p className="font-semibold text-gray-900">
+                      {creator?.firstname} {creator?.lastname}
+                    </p>
+                  </Link>
                   <p className="text-xs text-gray-500">
                     {creator?.followers?.length || "0"} followers
                   </p>
