@@ -10,7 +10,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
   const { data: session, status } = useSession()
 
   useEffect(() => {
-    console.log({ status }, session?.user)
+    // console.log({ status }, session?.user)
     if (!session?.user || status !== "authenticated") {
       setUser(null)
     }

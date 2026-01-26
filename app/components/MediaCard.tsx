@@ -161,29 +161,30 @@ export default function MediaCard({
         <div className="buttons-overlay-div absolute hidden md:block inset-0 z-10 opacity-0 group-hover:opacity-100 transition-opacity duration-100 bg-black/10 cursor-pointer pointer-events-none">
           <div className="w-full h-full flex flex-col justify-between items-end p-2 pointer-events-none z-20">
             <div className="w-fit pointer-events-auto ">
-              {isProfilePage && onUnsave ? (
-                <button
-                  onClick={() => onUnsave(item._id!)}
-                  className={`p-3 rounded-2xl bg-gray-500
+              {user &&
+                (isProfilePage && onUnsave ? (
+                  <button
+                    onClick={() => onUnsave(item._id!)}
+                    className={`p-3 rounded-2xl bg-gray-500
                  ${
                    isCreator ? "cursor-not-allowed" : "cursor-pointer"
                  } text-white font-medium hover:scale-105 scale-95 transition-all duration-100`}
-                >
-                  Unsave
-                </button>
-              ) : (
-                <button
-                  disabled={isCreator}
-                  onClick={handleSave}
-                  className={`p-3 rounded-2xl  ${
-                    isSaved || isCreator ? "bg-gray-700" : "bg-red-600"
-                  } ${
-                    isCreator ? "cursor-not-allowed" : "cursor-pointer"
-                  } text-white font-medium hover:scale-105 scale-95 transition-all duration-100`}
-                >
-                  {isSaved ? "Saved" : "Save"}
-                </button>
-              )}
+                  >
+                    Unsave
+                  </button>
+                ) : (
+                  <button
+                    disabled={isCreator}
+                    onClick={handleSave}
+                    className={`p-3 rounded-2xl  ${
+                      isSaved || isCreator ? "bg-gray-700" : "bg-red-600"
+                    } ${
+                      isCreator ? "cursor-not-allowed" : "cursor-pointer"
+                    } text-white font-medium hover:scale-105 scale-95 transition-all duration-100`}
+                  >
+                    {isSaved ? "Saved" : "Save"}
+                  </button>
+                ))}
             </div>
             <div className="w-full flex items-center justify-end pointer-events-auto">
               <button

@@ -24,15 +24,18 @@ import { toggleSave } from "@/actions/toggleSave"
 import toast from "react-hot-toast"
 import { useRouter } from "next/navigation"
 import Link from "next/link"
+import Skeleton from "./Skeleton"
 
 export default function MediaComponent({
   mediaData,
+  isLoading,
 }: {
+  isLoading: boolean
   mediaData: IMediaClient
 }) {
   const [isLiked, setIsLiked] = useState(false)
   const [isSaved, setIsSaved] = useState(false)
-  const [likes, setLikes] = useState(mediaData.likes?.length || 0)
+  const [likes, setLikes] = useState(mediaData?.likes?.length || 0)
   const { user } = useUserStore()
   const [creator, setCreator] = useState<IUserClient>()
   const [hasInteracted, setHasInteracted] = useState(false)
@@ -102,8 +105,9 @@ export default function MediaComponent({
   }
 
   useEffect(() => {
+    if (!mediaData) return
     const getCreator = async () => {
-      const data = await getUserData(mediaData.uploadedBy)
+      const data = await getUserData(mediaData?.uploadedBy)
       setCreator(data)
     }
     getCreator()
@@ -131,10 +135,8 @@ export default function MediaComponent({
     }
   }, [user?._id, mediaData])
 
-  if (!mediaData) {
-    return (
-      <div className="text-center mt-20 text-gray-500">Media not found</div>
-    )
+  if (isLoading || !mediaData) {
+    return <Skeleton />
   }
 
   return (
@@ -239,7 +241,7 @@ export default function MediaComponent({
               </p>
             </div>
             <div>
-              <div className="flex border-1 items-center gap-3">
+              <div className="flex items-center gap-3">
                 <Link
                   className="w-12 h-12 bg-gradient-to-br overflow-hidden bg-gray-400 rounded-full flex items-center justify-center text-white font-bold shadow-md"
                   href={`/profile/${creator?._id}`}

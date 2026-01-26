@@ -9,7 +9,7 @@ import {
   getSavedMedia,
   getUserData,
 } from "@/actions/userActions"
-import { useParams } from "next/navigation"
+import { useParams, usePathname } from "next/navigation"
 import { useUserStore } from "@/store/useUserStore"
 import Image from "next/image"
 import { deleteMedia } from "@/actions/deleteMedia"
@@ -17,6 +17,7 @@ import toast from "react-hot-toast"
 import { unsaveMedia } from "@/actions/unsaveMedia"
 import ConfirmDeleteModal from "@/app/components/ConfirmtDeleteModal"
 import { useSession } from "next-auth/react"
+import { toggleFollow } from "@/actions/toggleFollow"
 
 export default function ProfilePage() {
   const [activeTab, setActiveTab] = useState<"created" | "saved">("created")
@@ -28,11 +29,16 @@ export default function ProfilePage() {
   const [isDeleting, setIsDeleting] = useState(false)
   const [isDeleteOpen, setIsDeleteOpen] = useState(false)
   const [mediaId, setMediaId] = useState("")
+  const [isOwner, setIsOwner] = useState(true)
+  const [isFollowing, setIsFollowing] = useState(false)
+  const [followersCount, setFollowersCount] = useState(
+    userData?.followers?.length || 0,
+  )
 
   const { data: session, status } = useSession()
 
   const params = useParams()
-  const userId = Array.isArray(params.id) ? params.id[0] : params.id
+  const creatorId = Array.isArray(params.id) ? params.id[0] : params.id
   const { user, setUser } = useUserStore()
 
   const handleDeleteMedia = async () => {
@@ -98,29 +104,57 @@ export default function ProfilePage() {
     }
   }
 
+  const handleFollow = async () => {
+    if (!user?._id || !creatorId) return
+    setIsFollowing((prev) => !prev)
+    try {
+      const result = await toggleFollow({
+        currentUserId: user._id,
+        targetUserId: creatorId,
+      })
+
+      setFollowersCount((prev) => (result.followed ? prev + 1 : prev - 1))
+      toast.success(result.followed ? "Followed" : "Unfollowed")
+    } catch (error) {
+      console.log(error)
+      toast.error("Action failed")
+    }
+  }
+
   useEffect(() => {
     const fetchData = async () => {
-      if (status === "unauthenticated" || !session?.user._id) return
-
+      // if (status === "unauthenticated" || !session?.user._id) return
+      if (!creatorId) return
+      setIsOwner(creatorId === user?._id)
       const [userDetails, created] = await Promise.all([
-        getUserData(session.user._id),
-        getCreatedMedia(session.user._id),
+        getUserData(creatorId),
+        getCreatedMedia(creatorId),
       ])
-
-      setUser(userDetails!)
 
       setUserData(userDetails)
       setMedia(created)
       setCreatedLoading(false)
     }
     fetchData()
-  }, [userId])
+  }, [creatorId, user])
+
+  useEffect(() => {
+    if (!userData) return
+    setFollowersCount(userData?.followers?.length || 0)
+
+    if (!userData?.followers) return
+
+    const followed = userData.followers.some(
+      (id: any) => id.toString() === user?._id,
+    )
+    setIsFollowing(followed)
+  }, [userData, user])
 
   const handleTabChange = async (tab: "created" | "saved") => {
     setActiveTab(tab)
     if (tab === "saved" && savedMedia.length === 0) {
       setSavedLoading(true)
-      const saved = await getSavedMedia(userId as string)
+      const saved = await getSavedMedia(creatorId as string)
       setSavedMedia(saved)
       setSavedLoading(false)
     }
@@ -171,7 +205,7 @@ export default function ProfilePage() {
             </div>
             <div className="text-center">
               <p className="text-2xl font-bold text-gray-900">
-                {userData?.followers?.length || 0}
+                {followersCount}
               </p>
               <p className="text-sm text-gray-600">Followers</p>
             </div>
@@ -185,17 +219,27 @@ export default function ProfilePage() {
 
           {/* Buttons */}
           <div className="flex items-center justify-center space-x-3">
-            <button className="px-6 py-3 bg-gray-100 hover:bg-gray-200 text-gray-900 font-semibold rounded-full transition flex items-center space-x-2">
+            <button className="px-6 py-3 cursor-pointer bg-gray-100 hover:bg-gray-200 text-gray-900 font-semibold rounded-full transition flex items-center space-x-2">
               <Share2 className="w-4 h-4" />
               <span>Share</span>
             </button>
-            <Link
-              href={"/profile/edit"}
-              className="px-6 py-3 bg-red-600 hover:bg-red-700 text-white font-semibold rounded-full transition flex items-center space-x-2"
-            >
-              <Edit2 className="w-4 h-4" />
-              <span>Edit profile</span>
-            </Link>
+            {user &&
+              (isOwner ? (
+                <Link
+                  href={"/profile/edit"}
+                  className="px-6 py-3 bg-red-600 hover:bg-red-700 text-white font-semibold rounded-full transition flex items-center space-x-2"
+                >
+                  <Edit2 className="w-4 h-4" />
+                  <span>Edit profile</span>
+                </Link>
+              ) : (
+                <button
+                  onClick={handleFollow}
+                  className={`px-6 py-3 ${isFollowing ? "bg-gray-500 hover:bg-gray-700" : "bg-red-600 hover:bg-red-700"} cursor-pointer text-white font-semibold rounded-full transition flex items-center space-x-2`}
+                >
+                  <span>{isFollowing ? "Following" : "Follow"}</span>
+                </button>
+              ))}
           </div>
         </div>
 

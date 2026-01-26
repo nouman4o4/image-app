@@ -21,6 +21,7 @@ export interface IUser {
   likedMedia?: Types.ObjectId[]
   provider: "credentials" | "google"
   password?: string
+  following?: Types.ObjectId[]
 
   comparePassword(candidatePassword: string): Promise<boolean>
 }
@@ -81,6 +82,7 @@ const UserSchema: Schema<IUserDocument> = new Schema(
 
     media: [{ type: Schema.Types.ObjectId, ref: "Media" }],
     followers: [{ type: Schema.Types.ObjectId, ref: "User" }],
+    following: [{ type: Schema.Types.ObjectId, ref: "User" }],
     savedMedia: [{ type: Schema.Types.ObjectId, ref: "Media" }],
     likedMedia: [{ type: Schema.Types.ObjectId, ref: "Media" }],
     totalLikes: { type: Number, default: 0 },
