@@ -34,7 +34,7 @@ export default function CommentsSection({ mediaId }: { mediaId: string }) {
   const userAuthenticated = status === "authenticated" && user !== null
 
   const handleCreateComment = async () => {
-    if (!userAuthenticated) {
+    if (!user) {
       toast.error("Please login first")
       return
     }

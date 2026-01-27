@@ -140,17 +140,17 @@ export default function MediaComponent({
   }
 
   return (
-    <div className=" w-full px-4 max-w-6xl">
+    <div className="w-full px-4 max-w-6xl mx-auto ">
       {/* Container with glassmorphism effect */}
-      <div className="w-full max-w-7xl">
+      <div className="w-full mx-auto ">
         <div
-          className={`w-full p-4 md:p-6 grid md:grid-cols-2 gap-2 md:gap-4 lg:gap-6 items-start bg-white rounded-3xl shadow-lg
+          className={`w-full p-4 md:p-6 grid md:grid-cols-2 gap-2 md:gap-4 lg:gap-6 items-start bgwhite rounded-3xl border-1 border-gray-200
             
           `}
         >
           {/* Media Section - Left Side */}
           <div className="relative group ">
-            <div className="relative w-full md:w-3/4 rounded-2xl overflow-hidden mx-auto">
+            <div className="relative w-full md:w-3/4 max-w-sm rounded-2xl overflow-hidden mx-auto">
               {/* Gradient overlay on hover */}
               <div className="absolute inset-0 bg-gradient-to-t from-black/20 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 z-10 pointer-events-none" />
 
@@ -158,7 +158,7 @@ export default function MediaComponent({
                 <Image
                   src={mediaData.mediaUrl}
                   alt={mediaData.title}
-                  className="w-full max-h-screen object-cover rounded md:rounded-xl "
+                  className="w-full max-h-[calc(100vh-100px)] object-cover rounded md:rounded-xl "
                   width={mediaData.transformation?.width}
                   height={mediaData.transformation?.height}
                 />
