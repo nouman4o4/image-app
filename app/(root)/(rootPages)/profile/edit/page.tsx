@@ -86,18 +86,18 @@ export default function EditProfile() {
       about: user?.about || "",
       errors: undefined,
       message: "",
-    }
+    },
   )
 
   return (
     <div className="min-h-screen">
       {/* Header */}
       <header className="bg-white border-b border-gray-200 sticky top-0 z-10 shadow-sm">
-        <div className="max-w-4xl mx-auto px-4 py-4 flex items-center justify-between">
+        <div className="w-full mx-auto px-4 py-4 flex items-center justify-between">
           <div className="flex items-center space-x-4">
             <button
               onClick={() => router.back()}
-              className="p-2 hover:bg-gray-100 rounded-full transition"
+              className="p-2 hover:bg-gray-100 rounded-full transition cursor-pointer"
             >
               <ChevronLeft className="w-6 h-6 text-gray-700" />
             </button>
@@ -108,17 +108,18 @@ export default function EditProfile() {
               <p className="text-sm text-gray-600">Keep your profile updated</p>
             </div>
           </div>
-          <button className="cursor-pointer px-6 py-2.5 bg-red-600 hover:bg-red-700 text-white font-semibold rounded-full transition shadow-sm">
-            Save
-          </button>
+          {/* <button
+            className={`cursor-pointer px-6 py-2.5  ${isPending ? "bg-gray-300" : "bg-red-600 hover:bg-red-700"} text-white font-semibold rounded-full transition shadow-sm`}
+          >
+            {isPending ? "Saving" : "Save"}
+          </button> */}
         </div>
       </header>
 
-      <div className="max-w-4xl mx-auto px-4 py-8">
+      <div className="max-w-6xl mx-auto px-4 py-8 lg:flex lg:gap-5 ">
         {/* Profile Photo Section */}
         <ProfilePhotoSection
           firstname={user?.firstname!}
-          lastname={user?.lastname!}
           profileImage={user?.profileImage?.imageUrl!}
         />
 
@@ -208,14 +209,17 @@ export default function EditProfile() {
             </div>
           </div>
           <div className="flex items-center justify-between mt-8 pb-8">
-            <button className="cursor-pointer px-6 py-3 text-gray-700 hover:bg-white hover:shadow-sm font-semibold rounded-full transition border border-gray-300">
+            <button
+              onClick={() => router.back()}
+              className="cursor-pointer px-6 py-3 text-gray-700 hover:bg-white hover:shadow-sm font-semibold rounded-full transition border border-gray-300"
+            >
               Cancel
             </button>
             <button
               type="submit"
               className="cursor-pointer px-8 py-3 bg-red-600 hover:bg-red-700 text-white font-semibold rounded-full transition shadow-sm"
             >
-              Save changes
+              {isPending ? "Saving..." : "Save changes"}
             </button>
           </div>
         </form>

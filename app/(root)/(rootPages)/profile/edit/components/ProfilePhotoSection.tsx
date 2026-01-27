@@ -10,12 +10,12 @@ import React, { useState } from "react"
 import toast from "react-hot-toast"
 interface Props {
   firstname: string
-  lastname: string
+
   profileImage: string
 }
 const ProfilePhotoSection: React.FC<Props> = ({
   firstname,
-  lastname,
+
   profileImage,
 }: Props) => {
   const [file, setFile] = useState<File>()
@@ -60,7 +60,7 @@ const ProfilePhotoSection: React.FC<Props> = ({
       // db action call here to update the user profile image in backend
       const updatedUser = await updateUserProfileImage(
         { imageUrl: uploadResponse.url!, identifier: uploadResponse.fileId! },
-        user?._id!
+        user?._id!,
       )
       if (!updatedUser) {
         toast.error("Something went wrong")
@@ -97,7 +97,7 @@ const ProfilePhotoSection: React.FC<Props> = ({
 
       const result = await removeProfileImage(
         user._id,
-        profileImage?.identifier!
+        profileImage?.identifier!,
       )
       if (!result || result.success) {
         // setUser({ ...user, profileImage: profileImage })
@@ -114,18 +114,18 @@ const ProfilePhotoSection: React.FC<Props> = ({
     }
   }
   return (
-    <div>
-      <div className="bg-white rounded-3xl shadow-sm border border-gray-200 p-4 md:p-8 mb-6">
+    <div className="lg:max-w-2/5">
+      <div className="bg-white rounded-3xl shadow-sm border border-gray-200 lg:h-full p-4 md:p-8 mb-6">
         <h2 className="text-lg font-semibold text-gray-900 mb-6">
           Profile photo
         </h2>
 
-        <div className="flex flex-col md:flex-row items-center md:items-start space-x-6">
+        <div className="flex gap-4 md:gap-0 lg:py-16 lg:gap-5 flex-col md:flex-row lg:flex-col items-center md:items-start lg:items-center space-x-6">
           <div className="relative">
             <div className="w-32 h-32 rounded-full overflow-hidden relative">
-              {!profileImage && !previewUrl && firstname && lastname ? (
-                <div className="w-32 h-32 bg-gradient-to-br from-purple-400 via-pink-400 to-red-400 rounded-full flex items-center justify-center text-white text-4xl font-bold shadow-lg">
-                  {firstname[0]} {lastname[0]}
+              {!profileImage && !previewUrl && firstname ? (
+                <div className="w-32 h-32 bg-gray-300 rounded-full flex items-center justify-center text-white text-4xl font-bold shadow-lg">
+                  {firstname[0].toUpperCase()}
                 </div>
               ) : (
                 <>
@@ -171,7 +171,7 @@ const ProfilePhotoSection: React.FC<Props> = ({
               Use a photo that clearly shows your face. You can also upload a
               logo or brand image.
             </p>
-            <div className="flex items-center space-x-3">
+            <div className="flex items-center justify-center md:justify-start lg:justify-center space-x-3">
               <button
                 // disabled={!isSelectedImageChanged}
                 onClick={() => {

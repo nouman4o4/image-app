@@ -130,8 +130,7 @@ export default function Navbar() {
                   />
                 ) : (
                   <div className="w-full h-full bg-gray-400 flex items-center justify-center text-white text-2xl font-bold shadow-lg">
-                    {user?.firstname?.[0]}
-                    {user?.lastname?.[0]}
+                    {user?.firstname?.[0].toUpperCase()}
                   </div>
                 )}
               </div>
@@ -184,8 +183,7 @@ export default function Navbar() {
                   />
                 ) : (
                   <div className="size-14  rounded-full bg-gray-400 flex items-center justify-center text-white text-xl font-bold shadow-lg">
-                    {user?.firstname?.[0]}
-                    {user?.lastname?.[0]}
+                    {user?.firstname?.[0].toUpperCase()}
                   </div>
                 )}
                 <div>

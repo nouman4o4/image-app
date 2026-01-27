@@ -176,7 +176,7 @@ export default function ProfilePage() {
               />
             ) : (
               <div className="w-full h-full bg-gradient-to-br bg-gray-300 flex items-center justify-center text-white text-4xl font-bold shadow-lg">
-                {userData?.firstname?.[0]} {userData?.lastname?.[0]}
+                {userData?.firstname?.[0].toUpperCase()}
               </div>
             )}
           </div>
