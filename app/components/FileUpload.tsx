@@ -195,20 +195,20 @@ export default function FileUpload() {
                 </label>
               </div>
             ) : (
-              <div className="relative mb-8 rounded-2xl overflow-hidden">
+              <div className="relative mb-4 flex justify-center rounded-2xl">
                 <button
                   type="button"
                   onClick={clearFile}
-                  className="absolute top-3 left-3 z-10 bg-gray-800 hover:bg-gray-900 text-white rounded-full p-2 transition-colors duration-200"
+                  className="absolute top-3 right-3  z-10 bg-red-600 hover:bg-red-800 cursor-pointer text-white rounded-full p-2 transition-colors duration-200"
                 >
-                  <X className="w-5 h-5" />
+                  <X className="size-3 md:size-5" />
                 </button>
-                <div className="h-96">
+                <div className="h-sm w-fit rounded-2xl overflow-hidden">
                   {fileType === "image" ? (
                     <img
                       src={previewUrl}
                       alt="preview"
-                      className="w-full h-full object-cover"
+                      className="h-full max-h-[calc(100vh-150px)] object-cover"
                     />
                   ) : (
                     <video
