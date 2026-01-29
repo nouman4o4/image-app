@@ -160,6 +160,26 @@ export default function ProfilePage() {
     }
   }
 
+  const handleShare = async () => {
+    if (!userData) return
+    const url = `${window.location.origin}/profile/${userData._id}`
+    if (navigator.share) {
+      try {
+        await navigator.share({
+          title: userData.firstname + " " + userData?.lastname,
+          text: "Checkout this Profile",
+          url: url,
+        })
+      } catch (err) {
+        // user cancelled — ignore
+      }
+    } else {
+      // fallback
+      await navigator.clipboard.writeText(url)
+      toast.success("Link copied to clipboard")
+    }
+  }
+
   return (
     <div className="bg-white">
       <div className="mx-auto px-4 py-12">
@@ -219,7 +239,10 @@ export default function ProfilePage() {
 
           {/* Buttons */}
           <div className="flex items-center justify-center space-x-3">
-            <button className="px-6 py-3 cursor-pointer bg-gray-100 hover:bg-gray-200 text-gray-900 font-semibold rounded-full transition flex items-center space-x-2">
+            <button
+              onClick={handleShare}
+              className="px-6 py-3 cursor-pointer bg-gray-100 hover:bg-gray-200 text-gray-900 font-semibold rounded-full transition flex items-center space-x-2"
+            >
               <Share2 className="w-4 h-4" />
               <span>Share</span>
             </button>
