@@ -13,12 +13,18 @@ export default function RelatedMedia() {
     const fetchAllMedia = async () => {
       try {
         setLoading(true)
-        const response: any = await apiClient.getMedia()
+        const response: any = await fetch("/api/media", {
+          cache: "force-cache",
+        })
+        if (!response.ok) {
+          return
+        }
         if (response.status! === "500") {
           console.error("Could not fetch the media due to server error.")
           return
         }
-        setMedia(response.data)
+        const jsonData = await response.json()
+        setMedia(jsonData.data)
       } catch (error) {
         console.error(error)
       } finally {

@@ -53,9 +53,9 @@ export default function page() {
   // }
 
   return (
-    <div className="w-full p-0 md:p-8">
+    <div className="w-full p-0 pt-2 md:p-8">
       <MediaComponent isLoading={isLoading} mediaData={mediaData!} />
-      <div className="px-2">
+      <div className="px-2 mt-12">
         <h1 className="text-2xl font-bold text-gray-800 uppercase my-5">
           Related content
         </h1>

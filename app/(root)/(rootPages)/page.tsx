@@ -12,7 +12,9 @@ export default function Home() {
     const fetchAllMedia = async () => {
       try {
         setLoading(true)
-        const response: any = await fetch("/api/media")
+        const response: any = await fetch("/api/media", {
+          cache: "force-cache",
+        })
         if (!response.ok) {
           return
         }

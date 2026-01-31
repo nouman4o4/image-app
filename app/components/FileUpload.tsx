@@ -148,10 +148,10 @@ export default function FileUpload() {
         <button
           onClick={handleSubmit}
           disabled={loading || !file || !title.trim()}
-          className={`py-2 px-6 rounded-full font-semibold transition-all duration-200 ${
+          className={`py-2 px-6 rounded-full font-semibold transition-all duration-200  ${
             loading || !file || !title.trim()
               ? "bg-gray-200 text-gray-500 cursor-not-allowed"
-              : "bg-red-500 text-white hover:bg-red-600 active:scale-95"
+              : "bg-red-500 text-white hover:bg-red-600 active:scale-95 cursor-pointer"
           }`}
         >
           {loading ? "Publishing..." : "Publish"}
@@ -196,19 +196,19 @@ export default function FileUpload() {
               </div>
             ) : (
               <div className="relative mb-4 flex justify-center rounded-2xl">
-                <button
-                  type="button"
-                  onClick={clearFile}
-                  className="absolute top-3 right-3  z-10 bg-red-600 hover:bg-red-800 cursor-pointer text-white rounded-full p-2 transition-colors duration-200"
-                >
-                  <X className="size-3 md:size-5" />
-                </button>
-                <div className="h-sm w-fit rounded-2xl overflow-hidden">
+                <div className="relative max-h-[calc(100vh-150px)] w-fit rounded-2xl overflow-hidden">
+                  <button
+                    type="button"
+                    onClick={clearFile}
+                    className="absolute top-2 right-2 z-20 bg-red-600 hover:bg-red-800 cursor-pointer text-white rounded-full p-2 transition-colors duration-200"
+                  >
+                    <X className="size-3 md:size-5" />
+                  </button>
                   {fileType === "image" ? (
                     <img
                       src={previewUrl}
                       alt="preview"
-                      className="h-full max-h-[calc(100vh-150px)] object-cover"
+                      className="h-full object-cover"
                     />
                   ) : (
                     <video
@@ -217,19 +217,18 @@ export default function FileUpload() {
                       className="w-full h-full object-cover"
                     />
                   )}
-                </div>
-
-                {loading && (
-                  <div className="absolute inset-0 bg-black/40 backdrop-blur-sm flex items-center justify-center z-10">
-                    <div className="flex flex-col items-center space-y-3">
-                      <div className="w-12 h-12 border-4 border-white border-t-transparent rounded-full animate-spin"></div>
-                      <p className="text-white font-medium text-sm">
-                        Uploading...
-                      </p>
-                      <p className="text-white/80 text-xs">{progress}%</p>
+                  {loading && (
+                    <div className="absolute inset-0 bg-black/40 backdrop-blur-sm flex items-center justify-center z-10 rounded-2xl">
+                      <div className="flex flex-col items-center space-y-3 ">
+                        <div className="w-12 h-12 border-4 border-white border-t-transparent rounded-full animate-spin"></div>
+                        <p className="text-white font-medium text-sm">
+                          Uploading...
+                        </p>
+                        <p className="text-white/80 text-xs">{progress}%</p>
+                      </div>
                     </div>
-                  </div>
-                )}
+                  )}{" "}
+                </div>
               </div>
             )}
           </div>

@@ -140,36 +140,37 @@ export default function MediaComponent({
   }
 
   return (
-    <div className="w-full px-4 max-w-6xl mx-auto ">
+    <div className="w-full md:px-4 max-w-6xl mx-auto ">
       {/* Container with glassmorphism effect */}
-      <div className="w-full mx-auto ">
+      <div className="w-full mx-auto">
         <div
-          className={`w-full p-4 md:p-6 grid md:grid-cols-2 gap-2 md:gap-4 lg:gap-6 items-start bgwhite rounded-3xl border-1 border-gray-200
+          className={`w-full p-4 md:p-6 grid md:grid-cols-2 gap-2 md:gap-4 lg:gap-6 items-start bgwhite rounded-3xl md:border-1 border-gray-200
             
           `}
         >
           {/* Media Section - Left Side */}
           <div className="relative group ">
-            <div className="relative w-full md:w-3/4 max-w-sm rounded-2xl overflow-hidden mx-auto">
-              {/* Gradient overlay on hover */}
-              <div className="absolute inset-0 bg-gradient-to-t from-black/20 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 z-10 pointer-events-none" />
+            <div className="w-full md:w-3/4 max-w-sm  overflow-hidden mx-auto">
+              <div className="relative w-fit h-fit overflow-hidden rounded-xl md:rounded-2xl">
+                {/* Gradient overlay on hover */}
+                <div className="absolute inset-0 bg-gradient-to-t from-black/20 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 z-10 pointer-events-none" />
 
-              {mediaData.fileType === "image" ? (
-                <Image
-                  src={mediaData.mediaUrl}
-                  alt={mediaData.title}
-                  className="w-full max-h-[calc(100vh-100px)] object-cover rounded md:rounded-xl "
-                  width={mediaData.transformation?.width}
-                  height={mediaData.transformation?.height}
-                />
-              ) : (
-                <Video
-                  src={mediaData.mediaUrl}
-                  controls
-                  className="w-full max-h-screen  h-auto object-cover rounded-3xl"
-                />
-              )}
-
+                {mediaData.fileType === "image" ? (
+                  <Image
+                    src={mediaData.mediaUrl}
+                    alt={mediaData.title}
+                    className="w-auto max-h-[calc(100vh-150px)] object-cover"
+                    width={mediaData.transformation?.width}
+                    height={mediaData.transformation?.height}
+                  />
+                ) : (
+                  <Video
+                    src={mediaData.mediaUrl}
+                    controls
+                    className="w-auto max-h-[calc(100vh-150px)] object-cover"
+                  />
+                )}
+              </div>
               {/* Floating action button */}
               {/* <button
                 onClick={() => setIsSaved(!isSaved)}

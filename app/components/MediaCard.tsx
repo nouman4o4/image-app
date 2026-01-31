@@ -21,6 +21,7 @@ import toast from "react-hot-toast"
 import { BsThreeDots } from "react-icons/bs"
 import { motion, AnimatePresence } from "motion/react"
 import SheetAction from "./SheetAction"
+import { useVideoDuration } from "@/hooks/useVideoDuration"
 
 export default function MediaCard({
   item,
@@ -40,6 +41,7 @@ export default function MediaCard({
   const { user } = useUserStore()
   const pathname = usePathname()
   const isProfilePage = pathname.startsWith("/profile")
+  const duration = useVideoDuration(item.mediaUrl)
 
   const handleSave = async () => {
     setHasInteractedWithSave(true)
@@ -109,6 +111,7 @@ export default function MediaCard({
   }
 
   useEffect(() => {
+    item.fileType === "video" && console.log("item: ", item)
     if (user?._id) {
       setIsCreator(item.uploadedBy.toString() === user?._id.toString())
     }
@@ -134,17 +137,18 @@ export default function MediaCard({
           {item.fileType === "image" ? (
             <Image
               src={item.mediaUrl}
-              width={500}
-              height={500}
+              width={200}
+              height={250}
               alt={item.title || "media"}
               className="w-full h-auto object-cover"
             />
           ) : (
             <Video
-              urlEndpoint={item.mediaUrl}
-              src={item.mediaUrl}
-              width={500}
-              height={500}
+              // urlEndpoint={item.mediaUrl}
+              src={item.thumbnailUrl}
+              width={200}
+              alt={item.title}
+              height={250}
               className="w-full h-auto object-cover rounded-t-2xl"
             />
           )}
@@ -152,7 +156,7 @@ export default function MediaCard({
         {item.fileType === "video" ? (
           <div className="video-duration absolute top-2 left-2 group-hover:opacity-0 opacity-100  ">
             <p className="p-1 rounded-lg bg-gray-200/70 text-gray-600 text-[10px]">
-              0:08
+              {duration}
             </p>
           </div>
         ) : (
