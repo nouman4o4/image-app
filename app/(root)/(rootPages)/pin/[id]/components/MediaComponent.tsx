@@ -171,17 +171,6 @@ export default function MediaComponent({
                   />
                 )}
               </div>
-              {/* Floating action button */}
-              {/* <button
-                onClick={() => setIsSaved(!isSaved)}
-                className="absolute top-4 right-4 z-20 bg-white/90 backdrop-blur-md p-3 rounded-full border-1 border-gray-300 shadow-lg hover:scale-110 transition-transform duration-200"
-              >
-                <Bookmark
-                  className={`w-5 h-5 transition-colors ${
-                    isSaved ? "fill-red-500 stroke-red-500" : "stroke-gray-700"
-                  }`}
-                />
-              </button> */}
             </div>{" "}
           </div>
 

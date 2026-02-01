@@ -20,6 +20,7 @@ export const mediaSchema = z.object({
     quality: z.number().min(1).max(100).optional(),
   }),
   uploadedBy: z.string().min(1, "Uploader ID is required"),
+  category: z.string().min(1, "Category is required").max(50, "Wrong input"),
 })
 
 export type MediaSchema = z.infer<typeof mediaSchema>

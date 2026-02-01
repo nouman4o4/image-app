@@ -14,6 +14,8 @@ export interface IMediaClient {
   _id?: string
   likes?: string[]
   fileId: string
+  category?: string
+  tag?: [string]
 }
 
 export interface IUserClient {

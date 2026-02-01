@@ -31,6 +31,7 @@ export interface IMedia {
   }
   uploadedBy: Types.ObjectId
   category: string
+  tags: string[]
   likes: Types.ObjectId[]
   comments: IComment[]
   fileId: string
@@ -86,13 +87,26 @@ const MediaSchema: Schema<IMediaDocument> = new Schema<IMediaDocument>(
     fileId: {
       type: String,
     },
+    category: {
+      type: String,
+      required: true,
+      trim: true,
+      lowercase: true,
+    },
+
+    tags: {
+      type: [String],
+      default: [],
+      index: true,
+    },
   },
-  { timestamps: true }
+  { timestamps: true },
 )
 
 MediaSchema.index({
   title: "text",
   description: "text",
+  tags: "text",
 })
 
 // ---------------------

@@ -1,38 +1,32 @@
 "use client"
 
+import { getRelatedMedia } from "@/actions/getRelatedMedia"
 import MediaContainer from "@/app/components/MediaContainer"
 import { apiClient } from "@/lib/api-client"
 import { IMediaClient } from "@/types/interfaces"
 
 import { useEffect, useState } from "react"
 
-export default function RelatedMedia() {
+export default function RelatedMedia({ mediaId }: { mediaId: string }) {
   const [media, setMedia] = useState<IMediaClient[]>()
   const [loading, setLoading] = useState(true)
+
   useEffect(() => {
-    const fetchAllMedia = async () => {
+    if (!mediaId) return
+
+    const fetchRelated = async () => {
       try {
-        setLoading(true)
-        const response: any = await fetch("/api/media", {
-          cache: "force-cache",
-        })
-        if (!response.ok) {
-          return
-        }
-        if (response.status! === "500") {
-          console.error("Could not fetch the media due to server error.")
-          return
-        }
-        const jsonData = await response.json()
-        setMedia(jsonData.data)
-      } catch (error) {
-        console.error(error)
+        const data = await getRelatedMedia(mediaId)
+        setMedia(data)
+      } catch (err) {
+        console.error(err)
       } finally {
         setLoading(false)
       }
     }
-    fetchAllMedia()
-  }, [])
+
+    fetchRelated()
+  }, [mediaId])
 
   return (
     <div>

@@ -13,13 +13,13 @@ export async function GET(request: NextRequest) {
     if (!media || media.length === 0) {
       return NextResponse.json(
         { message: "Seemse like no media is available", data: media },
-        { status: 200 }
+        { status: 200 },
       )
     }
 
     return NextResponse.json(
       { data: media, success: true, message: "opration successfull" },
-      { status: 200 }
+      { status: 200 },
     )
   } catch (error) {
     console.log(error)
@@ -27,7 +27,7 @@ export async function GET(request: NextRequest) {
       {
         error: "Failed to fetch videos",
       },
-      { status: 500 }
+      { status: 500 },
     )
   }
 }
@@ -38,7 +38,7 @@ export async function POST(request: NextRequest) {
     if (!session) {
       return NextResponse.json(
         { error: "Unauthorized request" },
-        { status: 403 }
+        { status: 403 },
       )
     }
     const body: IMedia = await request.json()
@@ -47,7 +47,7 @@ export async function POST(request: NextRequest) {
     if (!user) {
       return NextResponse.json(
         { error: "User not found, please login again" },
-        { status: 403 }
+        { status: 403 },
       )
     }
 
@@ -59,7 +59,7 @@ export async function POST(request: NextRequest) {
           success: false,
           error: zodValidationResult.error.flatten().fieldErrors,
         },
-        { status: 400 }
+        { status: 400 },
       )
     }
     await connectDB()
@@ -75,13 +75,13 @@ export async function POST(request: NextRequest) {
     const newMedia = await Media.create(data)
     return NextResponse.json(
       { success: true, message: "Media saved successfully", newMedia },
-      { status: 202 }
+      { status: 202 },
     )
   } catch (error) {
     console.log({ error })
     return NextResponse.json(
       { success: false, error: "Failed to create a video" },
-      { status: 500 }
+      { status: 500 },
     )
   }
 }
