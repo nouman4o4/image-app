@@ -111,7 +111,6 @@ export default function MediaCard({
   }
 
   useEffect(() => {
-    item.fileType === "video" && console.log("item: ", item)
     if (user?._id) {
       setIsCreator(item.uploadedBy.toString() === user?._id.toString())
     }

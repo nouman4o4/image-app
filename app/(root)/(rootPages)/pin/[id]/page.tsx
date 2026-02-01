@@ -59,7 +59,7 @@ export default function page() {
         <h1 className="text-2xl font-bold text-gray-800 uppercase my-5">
           Related content
         </h1>
-        <RelatedMedia />
+        <RelatedMedia mediaId={mediaData?._id!} />
       </div>
     </div>
   )

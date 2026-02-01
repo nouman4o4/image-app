@@ -7,12 +7,15 @@ import { fileUploadShcema } from "@/schemas/fileuploadSchema"
 import { useRouter } from "next/navigation"
 import { signOut, useSession } from "next-auth/react"
 import { useFileUpload } from "@/hooks/useFileUpload"
+import { useUserStore } from "@/store/useUserStore"
 
 interface FileUploadState {
   file?: string[]
   title?: string[]
   descirption?: string[]
 }
+
+// fix ux issue in preview
 
 export default function FileUpload() {
   const [title, setTitle] = useState("")
@@ -21,6 +24,9 @@ export default function FileUpload() {
   const [previewUrl, setPreviewUrl] = useState<string | null>(null)
   const [fileType, setFileType] = useState<"image" | "video" | null>(null)
   const [loading, setLoading] = useState(false)
+  const [category, setCategory] = useState("")
+  const [tags, setTags] = useState<string[]>([])
+  const [tagInput, setTagInput] = useState("")
 
   // const [progress, setProgress] = useState(0)
   const { data: session, status } = useSession()
@@ -29,6 +35,9 @@ export default function FileUpload() {
     title?: string[]
     descirption?: string[]
   } | null>()
+
+  const { user } = useUserStore()
+
   const router = useRouter()
 
   const { uploadFile, progress, setProgress } = useFileUpload()
@@ -51,11 +60,17 @@ export default function FileUpload() {
 
   // submit upload
   const handleSubmit = async (e: React.FormEvent) => {
+    if (!user) {
+      toast.error("Please login to Upload Your pin")
+      router.push("/login")
+      return
+    }
     e.preventDefault()
     const inputsValdatonResult = fileUploadShcema.safeParse({
       title,
       description,
       file,
+      category,
     })
     if (!file || !inputsValdatonResult.success) {
       !file && toast.error("Please select a file image/video")
@@ -74,8 +89,10 @@ export default function FileUpload() {
         return
       }
       const body = {
-        title: title,
-        description: description,
+        title,
+        description,
+        category: category.toLowerCase().trim(),
+        tags,
         fileType: file.type.startsWith("video") ? "video" : "image",
         mediaUrl: uploadResponse.url,
         thumbnailUrl: uploadResponse.thumbnailUrl ?? uploadResponse.url,
@@ -83,7 +100,7 @@ export default function FileUpload() {
           width: uploadResponse.width,
           height: uploadResponse.height,
         },
-        uploadedBy: session?.user._id!,
+        uploadedBy: user._id!,
         fileId: uploadResponse.fileId,
       }
 
@@ -131,6 +148,19 @@ export default function FileUpload() {
     setFileType(null)
     setPreviewUrl(null)
     setErrors({ ...errors, file: undefined })
+  }
+
+  const addTag = () => {
+    const cleanTag = tagInput.trim().toLowerCase()
+    if (!cleanTag) return
+    if (tags.includes(cleanTag)) return
+
+    setTags((prev) => [...prev, cleanTag])
+    setTagInput("")
+  }
+
+  const removeTag = (tag: string) => {
+    setTags((prev) => prev.filter((t) => t !== tag))
   }
   return (
     <div className=" w-full flex flex-col">
@@ -288,6 +318,66 @@ export default function FileUpload() {
                 <p className="text-sm text-red-500 mt-1">
                   {errors.descirption[0]}
                 </p>
+              )}
+            </div>
+
+            {/* Category */}
+            <div className="mb-6">
+              <label className="block text-gray-800 font-semibold mb-3">
+                Category <span className="text-red-500">*</span>
+              </label>
+
+              <input
+                type="text"
+                value={category}
+                onChange={(e) => setCategory(e.target.value)}
+                placeholder="e.g. UI Design, Nature, Photography"
+                className="w-full border border-gray-300 rounded-xl px-4 py-3
+      focus:outline-none focus:ring-2 focus:ring-gray-100"
+              />
+            </div>
+
+            {/* Tags */}
+            <div className="mb-6">
+              <label className="block text-gray-800 font-semibold mb-3">
+                Tags
+              </label>
+
+              <input
+                type="text"
+                value={tagInput}
+                onChange={(e) => setTagInput(e.target.value)}
+                onKeyDown={(e) => {
+                  if (e.key === "Enter") {
+                    e.preventDefault()
+                    addTag()
+                  }
+                }}
+                placeholder="Press Enter to add tags"
+                className="w-full border border-gray-300 rounded-xl px-4 py-3
+      focus:outline-none focus:ring-2 focus:ring-gray-100"
+              />
+
+              {/* Tags List */}
+              {tags.length > 0 && (
+                <div className="flex flex-wrap gap-2 mt-3">
+                  {tags.map((tag) => (
+                    <span
+                      key={tag}
+                      className="flex items-center gap-2 bg-gray-100 px-3 py-1
+            rounded-full text-sm text-gray-700"
+                    >
+                      #{tag}
+                      <button
+                        type="button"
+                        onClick={() => removeTag(tag)}
+                        className="text-gray-500 hover:text-red-500"
+                      >
+                        <X className="w-3 h-3" />
+                      </button>
+                    </span>
+                  ))}
+                </div>
               )}
             </div>
           </div>
