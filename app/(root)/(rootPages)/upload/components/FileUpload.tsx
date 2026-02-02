@@ -191,7 +191,7 @@ export default function FileUpload() {
       {/* Main Content */}
       <div className="flex flex-1 flex-col md:flex-row w-full max-w-6xl mx-auto">
         {/* Left Side - Upload Area */}
-        <div className="w-full lg:w-1/2 flex flex-col items-center justify-center p-8 lg:p-16 bg-white">
+        <div className="w-full lg:w-1/2 flex flex-col items-center justify-center p-4 md:p-8 lg:p-16 bg-white">
           <div className="w-full max-w-md">
             {!previewUrl ? (
               <div
@@ -225,7 +225,7 @@ export default function FileUpload() {
                 </label>
               </div>
             ) : (
-              <div className="relative mb-4 flex justify-center rounded-2xl">
+              <div className="relative mb-4 flex justify-center rounded-2xl items-center">
                 <div className="relative max-h-[calc(100vh-150px)] w-fit rounded-2xl overflow-hidden">
                   <button
                     type="button"
@@ -238,13 +238,13 @@ export default function FileUpload() {
                     <img
                       src={previewUrl}
                       alt="preview"
-                      className="h-full object-cover"
+                      className="h-full max-h-[calc(100vh-150px)] rounded-2xl"
                     />
                   ) : (
                     <video
                       src={previewUrl}
                       controls
-                      className="w-full h-full object-cover"
+                      className=" h-full max-h-[calc(100vh-150px)] object-cover rounded-2xl"
                     />
                   )}
                   {loading && (
