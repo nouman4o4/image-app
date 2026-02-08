@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react"
 import Link from "next/link"
-import { Bell, Home, User2, PlusSquare } from "lucide-react"
+import { Bell, Home, User2, PlusSquare, Sparkles } from "lucide-react"
 import { useUserStore } from "@/store/useUserStore"
 import { useSession } from "next-auth/react"
 import NLogo from "./NLogo"
@@ -43,6 +43,12 @@ export default function Sidebar() {
       icon: <PlusSquare />,
       href: "/upload",
       label: "Create",
+    },
+    {
+      id: "ai-editor",
+      icon: <Sparkles />,
+      href: "/ai-editor",
+      label: "AI Editor",
     },
     {
       id: "notifications",
