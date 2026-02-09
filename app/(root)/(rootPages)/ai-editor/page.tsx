@@ -2,21 +2,67 @@
 
 import { useState } from "react"
 import { Sparkles, UploadCloud, Image as ImageIcon } from "lucide-react"
+import toast from "react-hot-toast"
+import { useFileUpload } from "@/hooks/useFileUpload"
+import { deleteImageKitFile } from "@/lib/imageKitDeleteFile"
 
 export default function AiEditorPage() {
   const [previewUrl, setPreviewUrl] = useState<string | null>(null)
   const [fileName, setFileName] = useState<string>("")
+  const [file, setFile] = useState<File | null>()
+  const [prompt, setPrompt] = useState("")
+  const [loading, setLoading] = useState(false)
+
+  const { uploadFile, progress, setProgress } = useFileUpload()
 
   const handleImageChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0]
     if (!file) {
       setPreviewUrl(null)
       setFileName("")
+      setFile(null)
       return
     }
+    setFile(file)
     const url = URL.createObjectURL(file)
     setPreviewUrl(url)
     setFileName(file.name)
+  }
+
+  const handleAiImageEditing = async () => {
+    toast("Ai functionality is being implemented")
+    return
+    if (!prompt || !file) {
+      toast.error("Please select an image and write a proper prompt!")
+      return
+    }
+    try {
+      setLoading(true)
+      const fileUploadResponse = await uploadFile(file, "/media")
+
+      if (!fileUploadResponse) {
+        toast.error("Failed to upload image")
+        return
+      }
+
+      const { fileId, url } = fileUploadResponse
+
+      if (!fileId || !url) {
+        toast.error("failed to upload image")
+        return
+      }
+
+      const apiResponse = await fetch("/api/ai/edit-image", {
+        method: "POST",
+        body: JSON.stringify({ prompt, url }),
+      })
+      await deleteImageKitFile(fileId)
+      console.log("apiResponse: ", apiResponse)
+    } catch (error) {
+      console.log(error)
+    } finally {
+      setLoading(false)
+    }
   }
 
   return (
@@ -73,6 +119,9 @@ export default function AiEditorPage() {
                   AI prompt
                 </label>
                 <textarea
+                  onChange={(e) => {
+                    setPrompt(e.currentTarget.value)
+                  }}
                   id="ai-prompt"
                   placeholder="e.g. Remove background, add soft sunset light, and sharpen the subject."
                   className="mt-2 min-h-[120px] w-full rounded-xl border border-gray-200 bg-white px-4 py-3 text-sm text-gray-700 shadow-sm outline-none focus:border-gray-300 focus:ring-2 focus:ring-red-200"
@@ -80,11 +129,17 @@ export default function AiEditorPage() {
               </div>
 
               <div className="flex flex-wrap gap-3">
-                <button className="rounded-xl bg-gray-200 px-4 py-2 text-sm font-medium text-gray-800 hover:bg-gray-300">
+                <button
+                  onClick={() => setPrompt("")}
+                  className="rounded-xl cursor-pointer bg-gray-200 px-4 py-2 text-sm font-medium text-gray-800 hover:bg-gray-300"
+                >
                   Clear
                 </button>
-                <button className="rounded-xl bg-red-600 px-4 py-2 text-sm font-medium text-white shadow-sm hover:bg-red-700">
-                  Generate edit
+                <button
+                  onClick={handleAiImageEditing}
+                  className="rounded-xl cursor-pointer bg-red-600 px-4 py-2 text-sm font-medium text-white shadow-sm hover:bg-red-700"
+                >
+                  {loading ? "Genrating edits" : "Generate edit"}
                 </button>
               </div>
             </div>
