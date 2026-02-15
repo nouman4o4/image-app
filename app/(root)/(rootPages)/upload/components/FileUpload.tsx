@@ -1,10 +1,10 @@
 "use client"
 
-import React, { useState } from "react"
+import React, { useEffect, useState } from "react"
 import { Upload, X, ChevronLeft } from "lucide-react"
 import toast from "react-hot-toast"
 import { fileUploadShcema } from "@/schemas/fileuploadSchema"
-import { useRouter } from "next/navigation"
+import { useRouter, useSearchParams } from "next/navigation"
 import { signOut, useSession } from "next-auth/react"
 import { useFileUpload } from "@/hooks/useFileUpload"
 import { useUserStore } from "@/store/useUserStore"
@@ -20,10 +20,11 @@ interface FileUploadState {
 export default function FileUpload() {
   const [title, setTitle] = useState("")
   const [description, setDescription] = useState("")
-  const [file, setFile] = useState<File | null>()
+  const [file, setFile] = useState<File | null>(null)
   const [previewUrl, setPreviewUrl] = useState<string | null>(null)
   const [fileType, setFileType] = useState<"image" | "video" | null>(null)
   const [loading, setLoading] = useState(false)
+  const [prefilled, setPrefilled] = useState(false)
   const [category, setCategory] = useState("")
   const [tags, setTags] = useState<string[]>([])
   const [tagInput, setTagInput] = useState("")
@@ -39,8 +40,35 @@ export default function FileUpload() {
   const { user } = useUserStore()
 
   const router = useRouter()
+  const searchParams = useSearchParams()
 
   const { uploadFile, progress, setProgress } = useFileUpload()
+
+  useEffect(() => {
+    if (prefilled) return
+    const imageUrl = searchParams.get("imageUrl")
+    if (!imageUrl) return
+
+    const hydrateFromUrl = async () => {
+      try {
+        setPrefilled(true)
+        setPreviewUrl(imageUrl)
+        setFileType("image")
+        const response = await fetch(imageUrl)
+        const blob = await response.blob()
+        const fileName = `ai-edit-${Date.now()}.jpg`
+        const fileFromUrl = new File([blob], fileName, {
+          type: blob.type || "image/jpeg",
+        })
+        setFile(fileFromUrl)
+      } catch (error) {
+        console.error(error)
+        toast.error("Failed to load the edited image.")
+      }
+    }
+
+    hydrateFromUrl()
+  }, [prefilled, searchParams])
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const selectedFile = e.target.files?.[0]

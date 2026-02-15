@@ -13,11 +13,15 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: "Prompt is required" }, { status: 400 })
     }
 
-    const output = await replicate.run("stability-ai/sdxl", {
+    const output = await replicate.run("timbrooks/instruct-pix2pix", {
       input: {
         prompt: prompt,
         image: imageUrl,
-        strength: 0.4,
+        scheduler: "K_EULER_ANCESTRAL",
+        num_outputs: 1,
+        guidance_scale: 7.5,
+        num_inference_steps: 100,
+        image_guidance_scale: 1.5,
       },
     })
 
