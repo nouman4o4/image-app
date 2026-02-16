@@ -5,7 +5,7 @@ import mongoose from "mongoose"
 
 export async function GET(
   req: Request,
-  { params }: { params: { mediaId: string } },
+  { params }: { params: Promise<{ mediaId: string }> },
 ) {
   try {
     await connectDB()
